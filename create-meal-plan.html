@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Meal Plan – DietSync</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="dashboard">
+
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">D</div>
+            DietSync
+        </div>
+        <div class="sidebar-nav">
+            <span class="sidebar-section-label">Dietitian Menu</span>
+            <a href="dietitian-dashboard.html">
+                <span class="nav-icon">&#128202;</span> Dashboard
+            </a>
+            <a href="#">
+                <span class="nav-icon">&#128101;</span> Users
+            </a>
+            <a href="create-meal-plan.html" class="active">
+                <span class="nav-icon">&#128214;</span> Meal Plans
+            </a>
+            <a href="#">
+                <span class="nav-icon">&#128172;</span> Feedback
+            </a>
+            <span class="sidebar-section-label">Account</span>
+            <a href="#">
+                <span class="nav-icon">&#128100;</span> Profile
+            </a>
+            <a href="login.html" class="logout-link">
+                <span class="nav-icon">&#128682;</span> Logout
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            <div class="user-chip">
+                <div class="user-avatar blue">SJ</div>
+                <div class="user-chip-info">
+                    <div class="name">Sarah Johnson</div>
+                    <div class="role">Dietitian</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+
+        <div class="topbar">
+            <div class="topbar-title">
+                <h4>Create Meal Plan</h4>
+                <p>Design a personalized meal plan for a user</p>
+            </div>
+            <div class="topbar-right">
+                <span class="topbar-date">&#128197; Monday, March 10, 2026</span>
+                <div class="user-avatar sm blue">SJ</div>
+            </div>
+        </div>
+
+        <div class="page-body">
+
+            <div class="two-col-layout">
+
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">&#128214; Meal Plan Details</span>
+                        </div>
+                        <div class="card-body">
+
+                            <div class="form-group">
+                                <label class="form-label" for="select-user">Select User</label>
+                                <select class="form-control" id="select-user">
+                                    <option value="">-- Choose a user --</option>
+                                    <option value="jd" selected>John Doe (BMI: 22.9 | Target: 2,156 kcal)</option>
+                                    <option value="lm">Lisa Martin (BMI: 20.4 | Target: 1,890 kcal)</option>
+                                    <option value="am">Ali Mustafa (BMI: 27.3 | Target: 2,400 kcal)</option>
+                                    <option value="nk">Nina Kim (BMI: 19.8 | Target: 1,750 kcal)</option>
+                                    <option value="rc">Robert Cruz (BMI: 31.2 | Target: 2,600 kcal)</option>
+                                    <option value="sp">Sara Park (BMI: 23.5 | Target: 2,000 kcal)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="plan-start">Plan Start Date</label>
+                                    <input class="form-control" type="date" id="plan-start" value="2026-03-09">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="plan-end">Plan End Date</label>
+                                    <input class="form-control" type="date" id="plan-end" value="2026-03-15">
+                                </div>
+                            </div>
+
+                            <hr class="rule">
+
+                            <div class="meal-field">
+                                <div class="meal-field-head">
+                                    <span class="meal-field-emoji">&#9728;&#65039;</span>
+                                    <label class="form-label" for="breakfast-text">Breakfast</label>
+                                    <span class="badge badge-green badge-ml-auto">~480 kcal</span>
+                                </div>
+                                <textarea
+                                    class="form-control"
+                                    id="breakfast-text"
+                                    rows="3"
+                                    placeholder="e.g. Oatmeal 150g, Boiled Egg 100g, Banana 100g, Low-fat Milk 100ml"
+                                >Oatmeal 150g, Boiled Egg 100g, Banana 100g, Low-fat Milk 100ml</textarea>
+                            </div>
+
+                            <div class="meal-field">
+                                <div class="meal-field-head">
+                                    <span class="meal-field-emoji">&#127774;</span>
+                                    <label class="form-label" for="lunch-text">Lunch</label>
+                                    <span class="badge badge-blue badge-ml-auto">~620 kcal</span>
+                                </div>
+                                <textarea
+                                    class="form-control"
+                                    id="lunch-text"
+                                    rows="3"
+                                    placeholder="e.g. Grilled Chicken 150g, White Rice 200g, Vegetable Soup 150ml, Apple 100g"
+                                >Grilled Chicken 150g, White Rice 200g, Vegetable Soup 150ml, Apple 100g</textarea>
+                            </div>
+
+                            <div class="meal-field">
+                                <div class="meal-field-head">
+                                    <span class="meal-field-emoji">&#127769;</span>
+                                    <label class="form-label" for="dinner-text">Dinner</label>
+                                    <span class="badge badge-yellow badge-ml-auto">~580 kcal</span>
+                                </div>
+                                <textarea
+                                    class="form-control"
+                                    id="dinner-text"
+                                    rows="3"
+                                    placeholder="e.g. Steamed Fish 180g, Brown Rice 180g, Vegetable Salad 100g"
+                                >Steamed Fish 180g, Brown Rice 180g, Vegetable Salad 100g</textarea>
+                            </div>
+
+                            <div class="meal-field">
+                                <div class="meal-field-head">
+                                    <span class="meal-field-emoji">&#127822;</span>
+                                    <label class="form-label" for="snack-text">Allowed Snacks</label>
+                                    <span class="badge badge-gray badge-ml-auto">~200 kcal</span>
+                                </div>
+                                <textarea
+                                    class="form-control"
+                                    id="snack-text"
+                                    rows="2"
+                                    placeholder="e.g. Apple, Banana, Low-fat Milk, Mixed Nuts (30g max)"
+                                >Apple (100g), Banana (100g), Mixed Nuts 30g max, Low-fat Milk 100ml</textarea>
+                            </div>
+
+                            <hr class="rule">
+
+                            <div class="form-group">
+                                <label class="form-label" for="notes">Dietitian Notes</label>
+                                <textarea
+                                    class="form-control"
+                                    id="notes"
+                                    rows="4"
+                                    placeholder="Write personalized notes for this user..."
+                                >Based on your BMI and activity level, this plan aims to maintain your current healthy weight. Eat at consistent times, stay hydrated, and log all meals accurately. Avoid fried and processed foods during this week.</textarea>
+                            </div>
+
+                            <div class="meal-actions">
+                                <button type="button" class="btn btn-primary">
+                                    &#128190; Save Meal Plan
+                                </button>
+                                <a href="dietitian-dashboard.html" class="btn btn-ghost">
+                                    Cancel
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+
+                    <div class="card mb-24">
+                        <div class="card-header">
+                            <span class="card-title">&#128100; Selected User Profile</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="preview-profile-head">
+                                <div class="flex-row gap-12 items-center">
+                                    <div class="preview-avatar">JD</div>
+                                    <div>
+                                        <div class="preview-name">John Doe</div>
+                                        <div class="preview-email">john.doe@email.com</div>
+                                    </div>
+                                </div>
+                                <span class="badge badge-green">Normal Weight</span>
+                            </div>
+                            <div class="preview-grid">
+                                <div class="preview-cell">
+                                    <div class="preview-cell-label">Age</div>
+                                    <div class="preview-cell-value">22</div>
+                                </div>
+                                <div class="preview-cell">
+                                    <div class="preview-cell-label">Gender</div>
+                                    <div class="preview-cell-value">Male</div>
+                                </div>
+                                <div class="preview-cell">
+                                    <div class="preview-cell-label">Height</div>
+                                    <div class="preview-cell-value">175 cm</div>
+                                </div>
+                                <div class="preview-cell">
+                                    <div class="preview-cell-label">Weight</div>
+                                    <div class="preview-cell-value">70 kg</div>
+                                </div>
+                                <div class="preview-cell highlight">
+                                    <div class="preview-cell-label">BMI</div>
+                                    <div class="preview-cell-value">22.9</div>
+                                </div>
+                                <div class="preview-cell highlight">
+                                    <div class="preview-cell-label">Calorie Need</div>
+                                    <div class="preview-cell-value">2,156</div>
+                                </div>
+                            </div>
+                            <div class="preview-activity">
+                                <span class="preview-activity-label">Activity Level</span>
+                                <span class="badge badge-green">Lightly Active</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-24">
+                        <div class="card-header">
+                            <span class="card-title">&#128293; Plan Calorie Summary</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="stack-8">
+                                <div class="kcal-row">
+                                    <span>&#9728;&#65039; Breakfast</span>
+                                    <span class="color-primary">~480 kcal</span>
+                                </div>
+                                <div class="kcal-row">
+                                    <span>&#127774; Lunch</span>
+                                    <span class="color-info">~716 kcal</span>
+                                </div>
+                                <div class="kcal-row">
+                                    <span>&#127769; Dinner</span>
+                                    <span class="color-warning">~534 kcal</span>
+                                </div>
+                                <div class="kcal-row">
+                                    <span>&#127822; Snacks</span>
+                                    <span class="color-muted">~200 kcal</span>
+                                </div>
+                                <div class="kcal-row primary">
+                                    <span>Total Plan Calories</span>
+                                    <span>1,930 kcal</span>
+                                </div>
+                                <div class="kcal-foot">
+                                    <small class="kcal-foot-note">Target: 2,156 kcal &nbsp;|&nbsp; </small>
+                                    <small class="kcal-foot-strong">226 kcal buffer remaining</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">&#128197; Previous Plans</span>
+                            <span class="badge badge-gray">John Doe</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="stack-8">
+                                <div class="plan-history-item">
+                                    <div>
+                                        <div class="plan-history-title">Mar 2–8, 2026</div>
+                                        <small class="plan-history-sub">Normal Maintenance Plan</small>
+                                    </div>
+                                    <span class="badge badge-green">Completed</span>
+                                </div>
+                                <div class="plan-history-item">
+                                    <div>
+                                        <div class="plan-history-title">Feb 23 – Mar 1, 2026</div>
+                                        <small class="plan-history-sub">Weight Stabilization Plan</small>
+                                    </div>
+                                    <span class="badge badge-green">Completed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

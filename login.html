@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login – DietSync</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+
+    <div class="auth-topbar">
+        <div class="auth-topbar-logo">
+            <div class="logo-icon">D</div>
+            DietSync
+        </div>
+        <a href="index.html" class="auth-link">&#8592; Back to Home</a>
+    </div>
+
+    <div class="auth-body">
+        <div class="auth-card">
+
+            <div class="auth-icon-row">
+                <div class="auth-icon-box">&#127807;</div>
+            </div>
+
+            <h2 class="text-center mb-8">Welcome Back</h2>
+            <p class="auth-subtitle text-center">Sign in to your DietSync account</p>
+
+            <!-- form doesnt really submit anywhere, links are just for demo -->
+            <form>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input
+                        class="form-control"
+                        type="email"
+                        id="email"
+                        placeholder="e.g. john@email.com"
+                        value="john.doe@email.com"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <input
+                        class="form-control"
+                        type="password"
+                        id="password"
+                        placeholder="Enter your password"
+                        value="••••••••"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="role">Login As</label>
+                    <select class="form-control" id="role">
+                        <option value="">Select Role</option>
+                        <option value="user" selected>User</option>
+                        <option value="dietitian">Dietitian</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <div class="forgot-row">
+                    <a href="#">Forgot password?</a>
+                </div>
+
+                <a href="user-dashboard.html" class="btn btn-primary btn-full mb-8">
+                    Sign In
+                </a>
+
+                <div class="form-divider">or</div>
+
+                <div class="register-note">
+                    Don't have an account?
+                    <a href="register.html" class="auth-strong">Register here</a>
+                </div>
+
+            </form>
+
+            <!-- shortcut buttons so you can click around the prototype fast -->
+            <div class="quick-login">
+                <p class="quick-login-title">Quick Login (Prototype)</p>
+                <div class="stack-8">
+                    <a href="user-dashboard.html" class="btn btn-ghost btn-sm">&#128100; Login as User</a>
+                    <a href="dietitian-dashboard.html" class="btn btn-ghost btn-sm">&#128104;&#8205;&#9877;&#65039; Login as Dietitian</a>
+                    <a href="admin-dashboard.html" class="btn btn-ghost btn-sm">&#128737; Login as Admin</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="auth-foot">
+        <small>&copy; 2026 DietSync — Student Project Prototype</small>
+    </div>
+
+</body>
+</html>

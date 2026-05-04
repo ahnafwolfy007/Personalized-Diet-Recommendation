@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diet Plan – DietSync</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="dashboard">
+
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">D</div>
+            DietSync
+        </div>
+        <div class="sidebar-nav">
+            <span class="sidebar-section-label">Main Menu</span>
+            <a href="user-dashboard.html">
+                <span class="nav-icon">&#128202;</span> Dashboard
+            </a>
+            <a href="log-food.html">
+                <span class="nav-icon">&#128203;</span> Log Food
+            </a>
+            <a href="daily-report.html">
+                <span class="nav-icon">&#128200;</span> Daily Report
+            </a>
+            <a href="diet-plan.html" class="active">
+                <span class="nav-icon">&#128214;</span> Diet Plan
+            </a>
+            <span class="sidebar-section-label">Account</span>
+            <a href="#">
+                <span class="nav-icon">&#128100;</span> Profile
+            </a>
+            <a href="login.html" class="logout-link">
+                <span class="nav-icon">&#128682;</span> Logout
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            <div class="user-chip">
+                <div class="user-avatar">JD</div>
+                <div class="user-chip-info">
+                    <div class="name">John Doe</div>
+                    <div class="role">User Account</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+
+        <div class="topbar">
+            <div class="topbar-title">
+                <h4>My Diet Plan</h4>
+                <p>Personalized meal plan by your dietitian</p>
+            </div>
+            <div class="topbar-right">
+                <span class="topbar-date">&#128197; Monday, March 10, 2026</span>
+                <div class="user-avatar sm">JD</div>
+            </div>
+        </div>
+
+        <div class="page-body">
+
+            <div class="alert alert-success mb-24">
+                <span class="alert-icon">&#127807;</span>
+                <div class="alert-body">
+                    <div class="alert-title">Diet Plan Active — Week of March 9–15, 2026</div>
+                    <p>This plan was created by <strong>Dietitian Sarah Johnson</strong> based on your health profile. Follow it consistently for best results.</p>
+                </div>
+            </div>
+
+            <div class="plan-stat-grid">
+                <div class="plan-stat-card">
+                    <div class="plan-stat-label">Daily Target</div>
+                    <div class="plan-stat-num primary">2,156</div>
+                    <div class="plan-stat-sub">kcal / day</div>
+                </div>
+                <div class="plan-stat-card">
+                    <div class="plan-stat-label">Plan Duration</div>
+                    <div class="plan-stat-num">7</div>
+                    <div class="plan-stat-sub">days</div>
+                </div>
+                <div class="plan-stat-card">
+                    <div class="plan-stat-label">Dietitian</div>
+                    <div class="plan-stat-name">Sarah J.</div>
+                    <div class="plan-stat-sub">Certified Nutritionist</div>
+                </div>
+                <div class="plan-stat-card">
+                    <div class="plan-stat-label">Plan Status</div>
+                    <div class="mt-8">
+                        <span class="badge badge-green">Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="meal-grid">
+
+                <div class="meal-card">
+                    <div class="meal-card-header meal-head-green">
+                        <span class="meal-icon">&#9728;&#65039;</span>
+                        <div>
+                            <h4>Breakfast</h4>
+                            <small class="meal-sub">7:00 – 8:00 AM &nbsp;|&nbsp; ~480 kcal</small>
+                        </div>
+                    </div>
+                    <div class="meal-card-body">
+                        <div class="meal-item">
+                            <span class="meal-item-name">Oatmeal (150g)</span>
+                            <span class="meal-item-cal">167 kcal</span>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-item-name">Boiled Egg (100g)</span>
+                            <span class="meal-item-cal">155 kcal</span>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-item-name">Banana (100g)</span>
+                            <span class="meal-item-cal">89 kcal</span>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-item-name">Low-fat Milk (100ml)</span>
+                            <span class="meal-item-cal">42 kcal</span>
+                        </div>
+                        <div class="meal-total green">
+                            Total: 453 kcal
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meal-card">
+                    <div class="meal-card-header meal-head-blue">
+                        <span class="meal-icon">&#127774;</span>
+                        <div>
+                            <h4 class="meal-title-blue">Lunch</h4>
+                            <small class="meal-sub blue">12:00 – 1:00 PM &nbsp;|&nbsp; ~620 kcal</small>
+                        </div>
+                    </div>
+                    <div class="meal-card-body">
+                        <div class="meal-item">
+                            <span class="meal-item-name">White Rice (200g)</span>
+                            <span class="meal-item-cal">260 kcal</span>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-item-name">Grilled Chicken (150g)</span>
+                            <span class="meal-item-cal">359 kcal</span>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-item-name">Vegetable Soup (150ml)</span>
+                            <span class="meal-item-cal">45 kcal</span>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-item-name">Apple (100g)</span>
+                            <span class="meal-item-cal">52 kcal</span>
+                        </div>
+                        <div class="meal-total blue">
+                            Total: 716 kcal
+                        </div>
+                    </div>
+                </div>
+
+                <div class="meal-card">
+                    <div class="meal-card-header meal-head-amber">
+                        <span class="meal-icon">&#127769;</span>
+                        <div>
+                            <h4 class="meal-title-amber">Dinner</h4>
+                            <small class="meal-sub amber">6:30 – 7:30 PM &nbsp;|&nbsp; ~580 kcal</small>
+                        </div>
+                    </div>
+                    <div class="meal-card-body">
+                        <div class="meal-item">
+                            <span class="meal-item-name">Brown Rice (180g)</span>
+                            <span class="meal-item-cal">219 kcal</span>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-item-name">Steamed Fish (180g)</span>
+                            <span class="meal-item-cal">230 kcal</span>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-item-name">Vegetable Salad (100g)</span>
+                            <span class="meal-item-cal">85 kcal</span>
+                        </div>
+                        <div class="meal-item">
+                            <span class="meal-item-name">Water (500ml)</span>
+                            <span class="meal-item-cal">0 kcal</span>
+                        </div>
+                        <div class="meal-total amber">
+                            Total: 534 kcal
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="card mb-24">
+                <div class="card-header">
+                    <span class="card-title">&#127822; Allowed Snacks</span>
+                    <span class="text-muted text-sm">2:00 – 4:00 PM &nbsp;|&nbsp; ~200 kcal</span>
+                </div>
+                <div class="card-body">
+                    <div class="snack-grid">
+                        <div class="snack-cell">
+                            <div class="snack-emoji">&#127822;</div>
+                            <div class="snack-name">Apple</div>
+                            <small class="snack-meta">52 kcal / 100g</small>
+                        </div>
+                        <div class="snack-cell">
+                            <div class="snack-emoji">&#127820;</div>
+                            <div class="snack-name">Banana</div>
+                            <small class="snack-meta">89 kcal / 100g</small>
+                        </div>
+                        <div class="snack-cell">
+                            <div class="snack-emoji">&#129371;</div>
+                            <div class="snack-name">Low-fat Milk</div>
+                            <small class="snack-meta">42 kcal / 100ml</small>
+                        </div>
+                        <div class="snack-cell">
+                            <div class="snack-emoji">&#129480;</div>
+                            <div class="snack-name">Mixed Nuts</div>
+                            <small class="snack-meta">30g max only</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notes-card">
+                <h4>
+                    <span>&#128104;&#8205;&#9877;&#65039;</span>
+                    Dietitian Notes — Sarah Johnson, RD
+                </h4>
+                <p>
+                    Hi John! Based on your BMI of <strong>22.9</strong> and your lightly active lifestyle, I've designed this plan to maintain your healthy weight while ensuring you get adequate nutrients throughout the day.
+                </p>
+                <p>
+                    <strong>Key recommendations:</strong> Try to eat at consistent times each day to support your metabolism. Prioritize protein at lunch for energy and muscle maintenance. Avoid processed snacks and replace them with the approved options listed above. Stay well-hydrated throughout the day — aim for at least 2 liters of water.
+                </p>
+                <p>
+                    If you experience hunger between meals, you may add a small portion of approved snacks. Please log all your food entries accurately so I can review and update your plan accordingly next week.
+                </p>
+                <div class="notes-sig">
+                    <div class="notes-avatar">SJ</div>
+                    <div>
+                        <div class="notes-name">Sarah Johnson, RD</div>
+                        <small class="notes-role">Registered Dietitian &mdash; Updated March 9, 2026</small>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

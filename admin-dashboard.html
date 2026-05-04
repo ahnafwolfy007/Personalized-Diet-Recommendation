@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard – DietSync</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- dashboard = sidebar (fixed) + main area. my css file has .dashboard for that -->
+
+<div class="dashboard">
+
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">D</div>
+            DietSync
+        </div>
+        <div class="sidebar-nav">
+            <span class="sidebar-section-label">Admin Panel</span>
+            <a href="admin-dashboard.html" class="active">
+                <span class="nav-icon">&#128202;</span> Dashboard
+            </a>
+            <a href="users-management.html">
+                <span class="nav-icon">&#128101;</span> Users Management
+            </a>
+            <a href="#">
+                <span class="nav-icon">&#128104;&#8205;&#9877;&#65039;</span> Dietitians
+            </a>
+            <a href="#">
+                <span class="nav-icon">&#128214;</span> Meal Plans
+            </a>
+            <a href="#">
+                <span class="nav-icon">&#128200;</span> Reports
+            </a>
+            <a href="#">
+                <span class="nav-icon">&#9881;&#65039;</span> Settings
+            </a>
+            <span class="sidebar-section-label">Account</span>
+            <a href="#">
+                <span class="nav-icon">&#128737;</span> Admin Profile
+            </a>
+            <a href="login.html" class="logout-link">
+                <span class="nav-icon">&#128682;</span> Logout
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            <div class="user-chip">
+                <div class="user-avatar purple">AD</div>
+                <div class="user-chip-info">
+                    <div class="name">Admin Panel</div>
+                    <div class="role">System Administrator</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+
+        <div class="topbar">
+            <div class="topbar-title">
+                <h4>Admin Dashboard</h4>
+                <p>System overview and management</p>
+            </div>
+            <div class="topbar-right">
+                <span class="topbar-date">&#128197; Monday, March 10, 2026</span>
+                <div class="user-avatar sm purple">AD</div>
+            </div>
+        </div>
+
+        <div class="page-body">
+
+            <div class="admin-stats-grid">
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon stat-icon-green">&#128101;</div>
+                    <div class="admin-stat-info">
+                        <div class="label">Total Users</div>
+                        <div class="value">148</div>
+                        <div class="sub">+12 this month</div>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon stat-icon-blue">&#128104;&#8205;&#9877;&#65039;</div>
+                    <div class="admin-stat-info">
+                        <div class="label">Total Dietitians</div>
+                        <div class="value">9</div>
+                        <div class="sub">3 active today</div>
+                    </div>
+                </div>
+
+                <div class="admin-stat-card">
+                    <div class="admin-stat-icon stat-icon-yellow">&#128214;</div>
+                    <div class="admin-stat-info">
+                        <div class="label">Active Meal Plans</div>
+                        <div class="value">62</div>
+                        <div class="sub">across all users</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-row">
+                        <div>
+                            <div class="stat-label">Food Logs Today</div>
+                            <div class="stat-value">412</div>
+                            <div class="stat-sub">entries submitted</div>
+                        </div>
+                        <div class="stat-icon stat-icon-green">&#128203;</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-row">
+                        <div>
+                            <div class="stat-label">Over Eating Users</div>
+                            <div class="stat-value color-warning">27</div>
+                            <div class="stat-sub">today's alerts</div>
+                        </div>
+                        <div class="stat-icon stat-icon-red">&#9888;&#65039;</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-row">
+                        <div>
+                            <div class="stat-label">New Registrations</div>
+                            <div class="stat-value color-primary">12</div>
+                            <div class="stat-sub">this month</div>
+                        </div>
+                        <div class="stat-icon stat-icon-blue">&#128100;</div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-row">
+                        <div>
+                            <div class="stat-label">System Uptime</div>
+                            <div class="stat-value">99.9<span class="uptime-small">%</span></div>
+                            <div class="stat-sub">last 30 days</div>
+                        </div>
+                        <div class="stat-icon stat-icon-green">&#128994;</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="grid-2fr-1fr">
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">&#128203; Recent User Registrations</span>
+                        <a href="users-management.html" class="btn btn-ghost btn-sm">View All</a>
+                    </div>
+                    <div class="card-body card-flush-top">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Role</th>
+                                        <th>Registered</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="table-user sm-gap">
+                                                <div class="avatar-circle green sm">JD</div>
+                                                <span>John Doe</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-green">User</span></td>
+                                        <td>Mar 10, 2026</td>
+                                        <td><span class="badge badge-green">Active</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="table-user sm-gap">
+                                                <div class="avatar-circle blue sm">LM</div>
+                                                <span>Lisa Martin</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-green">User</span></td>
+                                        <td>Mar 9, 2026</td>
+                                        <td><span class="badge badge-green">Active</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="table-user sm-gap">
+                                                <div class="avatar-circle blue sm">SJ</div>
+                                                <span>Sarah Johnson</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-blue">Dietitian</span></td>
+                                        <td>Mar 7, 2026</td>
+                                        <td><span class="badge badge-green">Active</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="table-user sm-gap">
+                                                <div class="avatar-circle amber sm">AM</div>
+                                                <span>Ali Mustafa</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-green">User</span></td>
+                                        <td>Mar 6, 2026</td>
+                                        <td><span class="badge badge-green">Active</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="table-user sm-gap">
+                                                <div class="avatar-circle red sm">RC</div>
+                                                <span>Robert Cruz</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge badge-green">User</span></td>
+                                        <td>Mar 5, 2026</td>
+                                        <td><span class="badge badge-gray">Inactive</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="side-stack">
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">&#9888;&#65039; System Alerts</span>
+                            <span class="badge badge-red">3 New</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert-stack">
+                                <div class="alert-box danger">
+                                    <div class="alert-box-title danger">Over Eating Alert</div>
+                                    <p>27 users exceeded calorie limits today.</p>
+                                </div>
+                                <div class="alert-box warn">
+                                    <div class="alert-box-title warn">Unassigned Users</div>
+                                    <p>5 users have no dietitian assigned.</p>
+                                </div>
+                                <div class="alert-box info">
+                                    <div class="alert-box-title info">New Registrations</div>
+                                    <p>12 new users joined this month.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">&#9889; Quick Actions</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="stack-8">
+                                <a href="users-management.html" class="btn btn-outline btn-full">&#128101; Manage Users</a>
+                                <a href="#" class="btn btn-ghost btn-full">&#128104;&#8205;&#9877;&#65039; Assign Dietitian</a>
+                                <a href="#" class="btn btn-ghost btn-full">&#128200; Generate Report</a>
+                                <a href="#" class="btn btn-ghost btn-full">&#9881;&#65039; System Settings</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">&#128104;&#8205;&#9877;&#65039; Dietitian Overview</span>
+                    <a href="#" class="btn btn-ghost btn-sm">Manage Dietitians</a>
+                </div>
+                <div class="card-body card-flush-top">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Dietitian</th>
+                                    <th>Specialization</th>
+                                    <th>Assigned Users</th>
+                                    <th>Meal Plans</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="table-user sm-gap">
+                                            <div class="avatar-circle blue">SJ</div>
+                                            <div>
+                                                <div class="user-name">Sarah Johnson, RD</div>
+                                                <small class="user-meta">sarah@dietsync.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Clinical Nutrition</td>
+                                    <td>12 users</td>
+                                    <td>8 active plans</td>
+                                    <td><span class="badge badge-green">Online</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-user sm-gap">
+                                            <div class="avatar-circle mint">MP</div>
+                                            <div>
+                                                <div class="user-name">Mark Peterson, RD</div>
+                                                <small class="user-meta">mark@dietsync.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Sports Nutrition</td>
+                                    <td>9 users</td>
+                                    <td>6 active plans</td>
+                                    <td><span class="badge badge-green">Online</span></td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="table-user sm-gap">
+                                            <div class="avatar-circle amber">AL</div>
+                                            <div>
+                                                <div class="user-name">Amanda Lee, RD</div>
+                                                <small class="user-meta">amanda@dietsync.com</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>Weight Management</td>
+                                    <td>7 users</td>
+                                    <td>5 active plans</td>
+                                    <td><span class="badge badge-gray">Offline</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
