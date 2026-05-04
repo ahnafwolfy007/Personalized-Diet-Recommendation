@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Food – DietSync</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="dashboard">
+
+    <div class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">D</div>
+            DietSync
+        </div>
+        <div class="sidebar-nav">
+            <span class="sidebar-section-label">Main Menu</span>
+            <a href="user-dashboard.html">
+                <span class="nav-icon">&#128202;</span> Dashboard
+            </a>
+            <a href="log-food.html" class="active">
+                <span class="nav-icon">&#128203;</span> Log Food
+            </a>
+            <a href="daily-report.html">
+                <span class="nav-icon">&#128200;</span> Daily Report
+            </a>
+            <a href="diet-plan.html">
+                <span class="nav-icon">&#128214;</span> Diet Plan
+            </a>
+            <span class="sidebar-section-label">Account</span>
+            <a href="#">
+                <span class="nav-icon">&#128100;</span> Profile
+            </a>
+            <a href="login.html" class="logout-link">
+                <span class="nav-icon">&#128682;</span> Logout
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            <div class="user-chip">
+                <div class="user-avatar">JD</div>
+                <div class="user-chip-info">
+                    <div class="name">John Doe</div>
+                    <div class="role">User Account</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+
+        <div class="topbar">
+            <div class="topbar-title">
+                <h4>Log Food</h4>
+                <p>Record your meals and track calorie intake</p>
+            </div>
+            <div class="topbar-right">
+                <span class="topbar-date">&#128197; Monday, March 10, 2026</span>
+                <div class="user-avatar sm">JD</div>
+            </div>
+        </div>
+
+        <div class="page-body">
+
+            <div class="alert alert-info mb-24">
+                <span class="alert-icon">&#128161;</span>
+                <div class="alert-body">
+                    <div class="alert-title">Tip: Log your meals throughout the day</div>
+                    <p>Select a food from the dropdown, enter the quantity in grams, and submit. Your calorie count updates instantly.</p>
+                </div>
+            </div>
+
+            <div class="two-col-layout">
+
+                <div>
+                    <div class="card mb-24">
+                        <div class="card-header">
+                            <span class="card-title">&#128203; Add Food Entry</span>
+                        </div>
+                        <div class="card-body">
+
+                            <div class="form-group">
+                                <label class="form-label" for="meal-type">Meal Type</label>
+                                <select class="form-control" id="meal-type">
+                                    <option value="">Select Meal Type</option>
+                                    <option value="breakfast" selected>Breakfast</option>
+                                    <option value="lunch">Lunch</option>
+                                    <option value="dinner">Dinner</option>
+                                    <option value="snack">Snack</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="food-name">Food Name</label>
+                                <select class="form-control" id="food-name">
+                                    <option value="">Select Food Item</option>
+                                    <option value="rice" selected>White Rice (130 kcal / 100g)</option>
+                                    <option value="chicken">Grilled Chicken (239 kcal / 100g)</option>
+                                    <option value="egg">Boiled Egg (155 kcal / 100g)</option>
+                                    <option value="apple">Apple (52 kcal / 100g)</option>
+                                    <option value="milk">Whole Milk (42 kcal / 100ml)</option>
+                                    <option value="oatmeal">Oatmeal (112 kcal / 100g)</option>
+                                    <option value="banana">Banana (89 kcal / 100g)</option>
+                                    <option value="fish">Steamed Fish (128 kcal / 100g)</option>
+                                    <option value="salad">Vegetable Salad (85 kcal / 100g)</option>
+                                    <option value="bread">Whole Wheat Bread (247 kcal / 100g)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="quantity">Quantity (grams / ml)</label>
+                                <input
+                                    class="form-control"
+                                    type="number"
+                                    id="quantity"
+                                    placeholder="Enter quantity"
+                                    value="150"
+                                >
+                                <small class="form-hint">Enter the amount consumed in grams (or ml for liquids)</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="log-time">Time of Consumption</label>
+                                <input
+                                    class="form-control"
+                                    type="time"
+                                    id="log-time"
+                                    value="07:30"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="food-notes">Notes (Optional)</label>
+                                <textarea
+                                    class="form-control"
+                                    id="food-notes"
+                                    rows="2"
+                                    placeholder="e.g. Home cooked, added salt"
+                                >Home cooked</textarea>
+                            </div>
+
+                            <button type="button" class="btn btn-primary btn-full">
+                                &#128203; Log Food Entry
+                            </button>
+
+                        </div>
+                    </div>
+
+                    <div class="calorie-result-card">
+                        <h3>&#9889; Calorie Calculation Result</h3>
+                        <div class="calorie-result-row">
+                            <span>Selected Food</span>
+                            <span>White Rice</span>
+                        </div>
+                        <div class="calorie-result-row">
+                            <span>Calorie per 100g</span>
+                            <span>130 kcal</span>
+                        </div>
+                        <div class="calorie-result-row">
+                            <span>Quantity Entered</span>
+                            <span>150 g</span>
+                        </div>
+                        <div class="calorie-result-row calorie-result-total">
+                            <span class="calorie-result-label">Total Calories</span>
+                            <span class="calorie-result-num">195 kcal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+
+                    <div class="card mb-24">
+                        <div class="card-header">
+                            <span class="card-title">&#128218; Food Calorie Reference</span>
+                        </div>
+                        <div class="card-body card-flush-top">
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Food Item</th>
+                                            <th>Category</th>
+                                            <th>Calories / 100g</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>White Rice</strong></td>
+                                            <td>Carbohydrate</td>
+                                            <td><span class="badge badge-yellow">130 kcal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Grilled Chicken</strong></td>
+                                            <td>Protein</td>
+                                            <td><span class="badge badge-yellow">239 kcal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Boiled Egg</strong></td>
+                                            <td>Protein</td>
+                                            <td><span class="badge badge-yellow">155 kcal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Apple</strong></td>
+                                            <td>Fruit</td>
+                                            <td><span class="badge badge-green">52 kcal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Whole Milk</strong></td>
+                                            <td>Dairy</td>
+                                            <td><span class="badge badge-green">42 kcal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Oatmeal</strong></td>
+                                            <td>Carbohydrate</td>
+                                            <td><span class="badge badge-yellow">112 kcal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Banana</strong></td>
+                                            <td>Fruit</td>
+                                            <td><span class="badge badge-green">89 kcal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Steamed Fish</strong></td>
+                                            <td>Protein</td>
+                                            <td><span class="badge badge-yellow">128 kcal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Vegetable Salad</strong></td>
+                                            <td>Vegetable</td>
+                                            <td><span class="badge badge-green">85 kcal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Whole Wheat Bread</strong></td>
+                                            <td>Carbohydrate</td>
+                                            <td><span class="badge badge-yellow">247 kcal</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">&#127829; Today's Food Log</span>
+                            <span class="badge badge-green">1,480 / 2,156 kcal</span>
+                        </div>
+                        <div class="card-body card-flush-top">
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Food</th>
+                                            <th>Meal</th>
+                                            <th>Qty</th>
+                                            <th>Cal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Oatmeal</td>
+                                            <td><span class="badge badge-blue">Breakfast</span></td>
+                                            <td>150g</td>
+                                            <td>167 kcal</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Boiled Egg</td>
+                                            <td><span class="badge badge-blue">Breakfast</span></td>
+                                            <td>100g</td>
+                                            <td>155 kcal</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Grilled Chicken</td>
+                                            <td><span class="badge badge-green">Lunch</span></td>
+                                            <td>200g</td>
+                                            <td>478 kcal</td>
+                                        </tr>
+                                        <tr>
+                                            <td>White Rice</td>
+                                            <td><span class="badge badge-green">Lunch</span></td>
+                                            <td>200g</td>
+                                            <td>260 kcal</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Apple</td>
+                                            <td><span class="badge badge-gray">Snack</span></td>
+                                            <td>150g</td>
+                                            <td>78 kcal</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Steamed Fish</td>
+                                            <td><span class="badge badge-yellow">Dinner</span></td>
+                                            <td>180g</td>
+                                            <td>230 kcal</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Vegetable Salad</td>
+                                            <td><span class="badge badge-yellow">Dinner</span></td>
+                                            <td>100g</td>
+                                            <td>85 kcal</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="log-footer">
+                                <span class="log-footer-label">Total Today</span>
+                                <span class="log-footer-value">1,453 kcal</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
