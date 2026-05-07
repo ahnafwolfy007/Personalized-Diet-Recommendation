@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DietSync – Register</title>
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./styles/register.css">
 </head>
 <body class="auth-page">
 
@@ -22,7 +22,7 @@
       </div>
 
       <!-- Form -->
-      <form id="register-form">
+      <form id="register-form" action="user-dashboard.html">
 
         <div class="grid grid-cols-2 gap-6 mb-6">
           <div>
@@ -93,7 +93,23 @@
           </div>
         </div>
 
-        <button type="submit" class="btn btn-primary btn-w-full py-3">Submit</button>
+        <div class="form-group">
+          <label for="register-as">Register As</label>
+          <div class="select-wrapper">
+            <select id="register-as">
+              <option value="Patient">Patient</option>
+              <option value="Dietitian">Dietitian</option>
+            </select>
+            <span class="select-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-w-full py-3">Register</button>
       </form>
 
       <!-- Login link -->
