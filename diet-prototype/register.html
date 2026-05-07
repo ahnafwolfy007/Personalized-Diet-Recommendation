@@ -6,15 +6,15 @@
   <title>DietSync – Register</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
-<body style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem;">
+<body class="auth-page">
 
-  <div style="width:100%; max-width:42rem;">
+  <div class="auth-wrap-wide">
     <div class="card p-8">
 
       <!-- Logo -->
       <div class="mb-8">
         <div class="flex items-center gap-2 justify-center mb-6">
-          <span class="logo-icon" style="width:2.5rem; height:2.5rem;"></span>
+          <span class="logo-icon logo-large"></span>
           <span class="font-medium text-xl">DietSync</span>
         </div>
         <h1 class="text-2xl text-center mb-2">Register</h1>
@@ -100,19 +100,12 @@
       <div class="mt-6 text-center">
         <p class="text-gray">
           Already have an account?
-          <a href="login.html" class="text-green" style="text-decoration:none;">Login</a>
+          <a href="login.html" class="text-green link-clean">Login</a>
         </p>
       </div>
 
     </div>
   </div>
-
-  <script>
-    document.getElementById('register-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      window.location.href = 'user-dashboard.html';
-    });
-  </script>
 
 </body>
 </html>

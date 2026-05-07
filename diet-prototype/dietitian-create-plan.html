@@ -40,7 +40,7 @@
       </a>
     </nav>
     <div class="sidebar-footer">
-      <a href="login.html" class="nav-link" style="margin-bottom:0;">
+      <a href="login.html" class="nav-link logout">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Logout
       </a>
@@ -104,7 +104,7 @@ Steamed Broccoli (150g) - 51 kcal</textarea>
           </div>
 
           <!-- Submit -->
-          <div style="padding-top:1rem;">
+          <div class="form-actions">
             <button type="submit" class="btn btn-primary flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               Save Plan
@@ -118,14 +118,6 @@ Steamed Broccoli (150g) - 51 kcal</textarea>
   </main>
 
 </div>
-
-<script>
-  document.getElementById('plan-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    alert('Meal plan saved successfully!');
-    window.location.href = 'dietitian-users.html';
-  });
-</script>
 
 </body>
 </html>

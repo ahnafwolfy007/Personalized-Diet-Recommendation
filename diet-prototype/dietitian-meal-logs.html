@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DietSync – Meal Logs</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <span class="logo-icon"></span>
+        <span class="logo-text">DietSync</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dietitian-dashboard.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Dashboard
+      </a>
+      <a href="dietitian-users.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Users
+      </a>
+      <a href="dietitian-create-plan.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="2" x2="3" y2="12"/><path d="M3 12a2 2 0 0 0 4 0V6"/><line x1="5" y1="2" x2="5" y2="6"/><line x1="7" y1="2" x2="7" y2="6"/><line x1="21" y1="2" x2="21" y2="22"/><path d="M17 2a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2v8"/></svg>
+        Meal Plans
+      </a>
+      <a href="dietitian-meal-logs.html" class="nav-link active">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Meal Logs
+      </a>
+      <a href="dietitian-feedback.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Feedback
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="login.html" class="nav-link logout">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="max-w-1200">
+      <h1 class="text-3xl mb-8">Meal Logs</h1>
+
+      <!-- Overview Table -->
+      <div class="bg-white border rounded-lg mb-6">
+        <div class="p-6 border-b">
+          <h2 class="text-xl">Today's Compliance Overview</h2>
+          <p class="text-sm text-gray mt-1">Click "View Details" to see individual meal breakdown and history</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Meals</th>
+                <th>Target Calories</th>
+                <th>Consumed</th>
+                <th>Compliance</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div>John Doe</div>
+                  <div class="text-xs text-gray">john@example.com</div>
+                </td>
+                <td class="text-gray">3/4</td>
+                <td class="text-gray">1,500 kcal</td>
+                <td class="text-gray">1,300 kcal</td>
+                <td>
+                  <div class="flex items-center gap-2">
+                    <div class="progress-track-sm">
+                      <div class="progress-fill fill-green w-75"></div>
+                    </div>
+                    <span class="text-sm text-green">75%</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-yellow">Good</span></td>
+                <td><button class="btn-link" onclick="openModal('john')">View Details</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div>Jane Smith</div>
+                  <div class="text-xs text-gray">jane@example.com</div>
+                </td>
+                <td class="text-gray">4/4</td>
+                <td class="text-gray">1,600 kcal</td>
+                <td class="text-gray">1,600 kcal</td>
+                <td>
+                  <div class="flex items-center gap-2">
+                    <div class="progress-track-sm">
+                      <div class="progress-fill fill-green w-100"></div>
+                    </div>
+                    <span class="text-sm text-green">100%</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-green">Excellent</span></td>
+                <td><button class="btn-link" onclick="openModal('jane')">View Details</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div>Mike Johnson</div>
+                  <div class="text-xs text-gray">mike@example.com</div>
+                </td>
+                <td class="text-gray">2/4</td>
+                <td class="text-gray">1,800 kcal</td>
+                <td class="text-gray">900 kcal</td>
+                <td>
+                  <div class="flex items-center gap-2">
+                    <div class="progress-track-sm">
+                      <div class="progress-fill fill-yellow w-50"></div>
+                    </div>
+                    <span class="text-sm text-yellow">50%</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-yellow">Good</span></td>
+                <td><button class="btn-link" onclick="openModal('mike')">View Details</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div>Sarah Williams</div>
+                  <div class="text-xs text-gray">sarah@example.com</div>
+                </td>
+                <td class="text-gray">4/4</td>
+                <td class="text-gray">1,400 kcal</td>
+                <td class="text-gray">1,420 kcal</td>
+                <td>
+                  <div class="flex items-center gap-2">
+                    <div class="progress-track-sm">
+                      <div class="progress-fill fill-green w-100"></div>
+                    </div>
+                    <span class="text-sm text-green">100%</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-green">Excellent</span></td>
+                <td><button class="btn-link" onclick="openModal('sarah')">View Details</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div>Tom Brown</div>
+                  <div class="text-xs text-gray">tom@example.com</div>
+                </td>
+                <td class="text-gray">1/4</td>
+                <td class="text-gray">1,700 kcal</td>
+                <td class="text-gray">320 kcal</td>
+                <td>
+                  <div class="flex items-center gap-2">
+                    <div class="progress-track-sm">
+                      <div class="progress-fill fill-red w-25"></div>
+                    </div>
+                    <span class="text-sm text-red">25%</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-red">Needs Help</span></td>
+                <td><button class="btn-link" onclick="openModal('tom')">View Details</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- Modal -->
+<div id="meal-modal" class="modal-overlay hidden">
+  <div class="modal-content modal-wide">
+    <div class="modal-header">
+      <div class="flex items-center gap-3">
+        <div class="icon-box">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <div>
+          <h2 class="text-xl" id="modal-title">Meal Log History</h2>
+          <p class="text-sm text-gray" id="modal-email"></p>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-nav">
+      <button class="tab-btn active" onclick="switchTab('today', this)">Today's Meals</button>
+      <button class="tab-btn" onclick="switchTab('week', this)">Last 7 Days</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Today's Meals Tab -->
+      <div id="tab-today" class="tab-content active">
+        <div id="modal-meals-table"></div>
+      </div>
+
+      <!-- Last 7 Days Tab -->
+      <div id="tab-week" class="tab-content">
+        <!-- Summary -->
+        <div class="grid grid-cols-3 gap-4 mb-6">
+          <div class="bg-gray border rounded-lg p-4">
+            <div class="text-xs text-gray mb-1">Avg Compliance</div>
+            <div class="text-2xl" id="week-avg-compliance"></div>
+            <div class="progress-bar"><div class="progress-bar-fill" id="week-compliance-bar"></div></div>
+          </div>
+          <div class="bg-gray border rounded-lg p-4">
+            <div class="text-xs text-gray mb-1">Meals Completed</div>
+            <div class="text-2xl" id="week-meals-done"></div>
+            <div class="text-xs mt-2 text-muted-light" id="week-meals-total"></div>
+          </div>
+          <div class="bg-gray border rounded-lg p-4">
+            <div class="text-xs text-gray mb-1">Avg Daily Calories</div>
+            <div class="text-2xl" id="week-avg-cals"></div>
+            <div class="text-xs mt-2 text-muted-light" id="week-target"></div>
+          </div>
+        </div>
+
+        <!-- Bar Chart -->
+        <div class="bg-gray border rounded-lg p-5 mb-6">
+          <div class="text-sm text-gray mb-4">Daily Compliance Rate</div>
+          <div class="bar-chart" id="week-bar-chart"></div>
+        </div>
+
+        <!-- Week Table -->
+        <div class="border rounded-lg overflow-hidden">
+          <table class="table-compact">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Meals</th>
+                <th>Calories</th>
+                <th>Compliance</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="week-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
