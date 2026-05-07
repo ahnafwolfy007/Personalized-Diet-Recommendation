@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DietSync – Meal Logs</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <span class="logo-icon"></span>
+        <span class="logo-text">DietSync</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dietitian-dashboard.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Dashboard
+      </a>
+      <a href="dietitian-users.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Users
+      </a>
+      <a href="dietitian-create-plan.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="2" x2="3" y2="12"/><path d="M3 12a2 2 0 0 0 4 0V6"/><line x1="5" y1="2" x2="5" y2="6"/><line x1="7" y1="2" x2="7" y2="6"/><line x1="21" y1="2" x2="21" y2="22"/><path d="M17 2a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2v8"/></svg>
+        Meal Plans
+      </a>
+      <a href="dietitian-meal-logs.html" class="nav-link active">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Meal Logs
+      </a>
+      <a href="dietitian-feedback.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Feedback
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="login.html" class="nav-link" style="margin-bottom:0;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="max-w-1200">
+      <h1 class="text-3xl mb-8">Meal Logs</h1>
+
+      <!-- Overview Table -->
+      <div class="bg-white border rounded-lg mb-6">
+        <div class="p-6 border-b">
+          <h2 class="text-xl">Today's Compliance Overview</h2>
+          <p class="text-sm text-gray mt-1">Click "View Details" to see individual meal breakdown and history</p>
+        </div>
+        <div class="overflow-x-auto">
+          <table>
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Meals</th>
+                <th>Target Calories</th>
+                <th>Consumed</th>
+                <th>Compliance</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div>John Doe</div>
+                  <div class="text-xs text-gray">john@example.com</div>
+                </td>
+                <td class="text-gray">3/4</td>
+                <td class="text-gray">1,500 kcal</td>
+                <td class="text-gray">1,300 kcal</td>
+                <td>
+                  <div class="flex items-center gap-2">
+                    <div style="width:5rem; background:#e0e0e0; border-radius:9999px; height:0.375rem;">
+                      <div style="width:75%; background:#22c55e; border-radius:9999px; height:0.375rem;"></div>
+                    </div>
+                    <span class="text-sm text-green">75%</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-yellow">Good</span></td>
+                <td><button class="btn-link" onclick="openModal('john')">View Details</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div>Jane Smith</div>
+                  <div class="text-xs text-gray">jane@example.com</div>
+                </td>
+                <td class="text-gray">4/4</td>
+                <td class="text-gray">1,600 kcal</td>
+                <td class="text-gray">1,600 kcal</td>
+                <td>
+                  <div class="flex items-center gap-2">
+                    <div style="width:5rem; background:#e0e0e0; border-radius:9999px; height:0.375rem;">
+                      <div style="width:100%; background:#22c55e; border-radius:9999px; height:0.375rem;"></div>
+                    </div>
+                    <span class="text-sm text-green">100%</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-green">Excellent</span></td>
+                <td><button class="btn-link" onclick="openModal('jane')">View Details</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div>Mike Johnson</div>
+                  <div class="text-xs text-gray">mike@example.com</div>
+                </td>
+                <td class="text-gray">2/4</td>
+                <td class="text-gray">1,800 kcal</td>
+                <td class="text-gray">900 kcal</td>
+                <td>
+                  <div class="flex items-center gap-2">
+                    <div style="width:5rem; background:#e0e0e0; border-radius:9999px; height:0.375rem;">
+                      <div style="width:50%; background:#f59e0b; border-radius:9999px; height:0.375rem;"></div>
+                    </div>
+                    <span class="text-sm text-yellow">50%</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-yellow">Good</span></td>
+                <td><button class="btn-link" onclick="openModal('mike')">View Details</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div>Sarah Williams</div>
+                  <div class="text-xs text-gray">sarah@example.com</div>
+                </td>
+                <td class="text-gray">4/4</td>
+                <td class="text-gray">1,400 kcal</td>
+                <td class="text-gray">1,420 kcal</td>
+                <td>
+                  <div class="flex items-center gap-2">
+                    <div style="width:5rem; background:#e0e0e0; border-radius:9999px; height:0.375rem;">
+                      <div style="width:100%; background:#22c55e; border-radius:9999px; height:0.375rem;"></div>
+                    </div>
+                    <span class="text-sm text-green">100%</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-green">Excellent</span></td>
+                <td><button class="btn-link" onclick="openModal('sarah')">View Details</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div>Tom Brown</div>
+                  <div class="text-xs text-gray">tom@example.com</div>
+                </td>
+                <td class="text-gray">1/4</td>
+                <td class="text-gray">1,700 kcal</td>
+                <td class="text-gray">320 kcal</td>
+                <td>
+                  <div class="flex items-center gap-2">
+                    <div style="width:5rem; background:#e0e0e0; border-radius:9999px; height:0.375rem;">
+                      <div style="width:25%; background:#ef4444; border-radius:9999px; height:0.375rem;"></div>
+                    </div>
+                    <span class="text-sm text-red">25%</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-red">Needs Help</span></td>
+                <td><button class="btn-link" onclick="openModal('tom')">View Details</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- Modal -->
+<div id="meal-modal" class="modal-overlay hidden">
+  <div class="modal-content" style="width:760px;">
+    <div class="modal-header">
+      <div class="flex items-center gap-3">
+        <div class="icon-box">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <div>
+          <h2 class="text-xl" id="modal-title">Meal Log History</h2>
+          <p class="text-sm text-gray" id="modal-email"></p>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-nav" style="border-bottom:1px solid #e0e0e0; padding:0;">
+      <button class="tab-btn active" onclick="switchTab('today', this)">Today's Meals</button>
+      <button class="tab-btn" onclick="switchTab('week', this)">Last 7 Days</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Today's Meals Tab -->
+      <div id="tab-today" class="tab-content active">
+        <div id="modal-meals-table"></div>
+      </div>
+
+      <!-- Last 7 Days Tab -->
+      <div id="tab-week" class="tab-content">
+        <!-- Summary -->
+        <div class="grid grid-cols-3 gap-4 mb-6">
+          <div class="bg-gray border rounded-lg p-4">
+            <div class="text-xs text-gray mb-1">Avg Compliance</div>
+            <div class="text-2xl" id="week-avg-compliance"></div>
+            <div class="progress-bar"><div class="progress-bar-fill" id="week-compliance-bar"></div></div>
+          </div>
+          <div class="bg-gray border rounded-lg p-4">
+            <div class="text-xs text-gray mb-1">Meals Completed</div>
+            <div class="text-2xl" id="week-meals-done"></div>
+            <div class="text-xs mt-2" style="color:#999;" id="week-meals-total"></div>
+          </div>
+          <div class="bg-gray border rounded-lg p-4">
+            <div class="text-xs text-gray mb-1">Avg Daily Calories</div>
+            <div class="text-2xl" id="week-avg-cals"></div>
+            <div class="text-xs mt-2" style="color:#999;" id="week-target"></div>
+          </div>
+        </div>
+
+        <!-- Bar Chart -->
+        <div class="bg-gray border rounded-lg p-5 mb-6">
+          <div class="text-sm text-gray mb-4">Daily Compliance Rate</div>
+          <div class="bar-chart" id="week-bar-chart"></div>
+        </div>
+
+        <!-- Week Table -->
+        <div class="border rounded-lg overflow-hidden">
+          <table>
+            <thead>
+              <tr>
+                <th style="padding:0.75rem 1rem; font-size:0.75rem;">Date</th>
+                <th style="padding:0.75rem 1rem; font-size:0.75rem;">Meals</th>
+                <th style="padding:0.75rem 1rem; font-size:0.75rem;">Calories</th>
+                <th style="padding:0.75rem 1rem; font-size:0.75rem;">Compliance</th>
+                <th style="padding:0.75rem 1rem; font-size:0.75rem;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="week-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+var userData = {
+  john: {
+    name: 'John Doe', email: 'john@example.com', targetCals: 1500,
+    meals: [
+      { type:'Breakfast', food:'Oatmeal (50g), Banana (1), Almonds (10)', cal:320, time:'08:00 AM', taken:true, takenAt:'08:15 AM' },
+      { type:'Lunch', food:'Chicken Breast (150g), Rice (100g), Broccoli (80g)', cal:480, time:'01:00 PM', taken:true, takenAt:'01:20 PM' },
+      { type:'Snack', food:'Apple (1), Greek Yogurt (100g)', cal:180, time:'04:00 PM', taken:true, takenAt:'04:05 PM' },
+      { type:'Dinner', food:'Salmon (120g), Quinoa (80g), Mixed Vegetables (100g)', cal:520, time:'07:00 PM', taken:false }
+    ],
+    week: [
+      {date:'Mar 23',day:'Sun',done:2,total:4,cals:850,rate:50},
+      {date:'Mar 24',day:'Mon',done:3,total:4,cals:1250,rate:75},
+      {date:'Mar 25',day:'Tue',done:4,total:4,cals:1500,rate:100},
+      {date:'Mar 26',day:'Wed',done:3,total:4,cals:1150,rate:75},
+      {date:'Mar 27',day:'Thu',done:2,total:4,cals:900,rate:50},
+      {date:'Mar 28',day:'Fri',done:4,total:4,cals:1480,rate:100},
+      {date:'Mar 29',day:'Sat',done:3,total:4,cals:1300,rate:75}
+    ]
+  },
+  jane: {
+    name: 'Jane Smith', email: 'jane@example.com', targetCals: 1600,
+    meals: [
+      { type:'Breakfast', food:'Scrambled Eggs (2), Whole Wheat Toast, OJ', cal:380, time:'07:30 AM', taken:true, takenAt:'07:35 AM' },
+      { type:'Lunch', food:'Tuna Salad, Brown Rice (100g), Cucumber', cal:430, time:'12:30 PM', taken:true, takenAt:'12:40 PM' },
+      { type:'Snack', food:'Mixed Nuts (30g), Protein Bar', cal:290, time:'03:30 PM', taken:true, takenAt:'03:30 PM' },
+      { type:'Dinner', food:'Grilled Chicken (150g), Sweet Potato, Spinach', cal:500, time:'07:00 PM', taken:true, takenAt:'07:15 PM' }
+    ],
+    week: [
+      {date:'Mar 23',day:'Sun',done:4,total:4,cals:1600,rate:100},
+      {date:'Mar 24',day:'Mon',done:4,total:4,cals:1580,rate:100},
+      {date:'Mar 25',day:'Tue',done:3,total:4,cals:1200,rate:75},
+      {date:'Mar 26',day:'Wed',done:4,total:4,cals:1610,rate:100},
+      {date:'Mar 27',day:'Thu',done:4,total:4,cals:1600,rate:100},
+      {date:'Mar 28',day:'Fri',done:4,total:4,cals:1590,rate:100},
+      {date:'Mar 29',day:'Sat',done:4,total:4,cals:1600,rate:100}
+    ]
+  },
+  mike: {
+    name: 'Mike Johnson', email: 'mike@example.com', targetCals: 1800,
+    meals: [
+      { type:'Breakfast', food:'Yogurt Parfait, Granola, Mixed Berries', cal:350, time:'08:00 AM', taken:true, takenAt:'08:10 AM' },
+      { type:'Lunch', food:'Lentil Soup (200ml), Whole Grain Bread, Salad', cal:420, time:'01:00 PM', taken:true, takenAt:'01:30 PM' },
+      { type:'Snack', food:'Banana (1), Peanut Butter (1 tbsp)', cal:190, time:'04:00 PM', taken:false },
+      { type:'Dinner', food:'Beef Stir Fry (120g), Noodles (80g), Bok Choy', cal:540, time:'07:30 PM', taken:false }
+    ],
+    week: [
+      {date:'Mar 23',day:'Sun',done:1,total:4,cals:350,rate:25},
+      {date:'Mar 24',day:'Mon',done:2,total:4,cals:770,rate:50},
+      {date:'Mar 25',day:'Tue',done:3,total:4,cals:1200,rate:75},
+      {date:'Mar 26',day:'Wed',done:2,total:4,cals:770,rate:50},
+      {date:'Mar 27',day:'Thu',done:1,total:4,cals:350,rate:25},
+      {date:'Mar 28',day:'Fri',done:2,total:4,cals:770,rate:50},
+      {date:'Mar 29',day:'Sat',done:2,total:4,cals:900,rate:50}
+    ]
+  },
+  sarah: {
+    name: 'Sarah Williams', email: 'sarah@example.com', targetCals: 1400,
+    meals: [
+      { type:'Breakfast', food:'Smoothie Bowl, Chia Seeds, Sliced Kiwi', cal:310, time:'07:00 AM', taken:true, takenAt:'07:05 AM' },
+      { type:'Lunch', food:'Quinoa Bowl (120g), Roasted Veggies, Feta', cal:400, time:'12:00 PM', taken:true, takenAt:'12:10 PM' },
+      { type:'Snack', food:'Cottage Cheese (100g), Pineapple Chunks', cal:170, time:'03:00 PM', taken:true, takenAt:'03:05 PM' },
+      { type:'Dinner', food:'Baked Cod (130g), Roasted Potatoes, Green Beans', cal:520, time:'06:30 PM', taken:true, takenAt:'06:45 PM' }
+    ],
+    week: [
+      {date:'Mar 23',day:'Sun',done:4,total:4,cals:1400,rate:100},
+      {date:'Mar 24',day:'Mon',done:4,total:4,cals:1420,rate:100},
+      {date:'Mar 25',day:'Tue',done:4,total:4,cals:1410,rate:100},
+      {date:'Mar 26',day:'Wed',done:3,total:4,cals:1050,rate:75},
+      {date:'Mar 27',day:'Thu',done:4,total:4,cals:1400,rate:100},
+      {date:'Mar 28',day:'Fri',done:4,total:4,cals:1395,rate:100},
+      {date:'Mar 29',day:'Sat',done:4,total:4,cals:1420,rate:100}
+    ]
+  },
+  tom: {
+    name: 'Tom Brown', email: 'tom@example.com', targetCals: 1700,
+    meals: [
+      { type:'Breakfast', food:'Oatmeal (50g), Honey, Walnuts (10g)', cal:320, time:'08:00 AM', taken:true, takenAt:'09:30 AM' },
+      { type:'Lunch', food:'Turkey Wrap, Lettuce, Tomato, Low-fat Mayo', cal:460, time:'01:00 PM', taken:false },
+      { type:'Snack', food:'Rice Cakes (3), Hummus (2 tbsp)', cal:160, time:'04:00 PM', taken:false },
+      { type:'Dinner', food:'Pasta (100g), Marinara Sauce, Ground Turkey (80g)', cal:550, time:'07:00 PM', taken:false }
+    ],
+    week: [
+      {date:'Mar 23',day:'Sun',done:0,total:4,cals:0,rate:0},
+      {date:'Mar 24',day:'Mon',done:1,total:4,cals:320,rate:25},
+      {date:'Mar 25',day:'Tue',done:2,total:4,cals:780,rate:50},
+      {date:'Mar 26',day:'Wed',done:1,total:4,cals:320,rate:25},
+      {date:'Mar 27',day:'Thu',done:0,total:4,cals:0,rate:0},
+      {date:'Mar 28',day:'Fri',done:1,total:4,cals:320,rate:25},
+      {date:'Mar 29',day:'Sat',done:1,total:4,cals:320,rate:25}
+    ]
+  }
+};
+
+var currentUser = null;
+
+function rateColor(r) { return r >= 80 ? '#22c55e' : r >= 50 ? '#f59e0b' : '#ef4444'; }
+function rateLabel(r) { return r >= 80 ? 'Excellent' : r >= 50 ? 'Good' : 'Needs Help'; }
+function rateBadge(r) { return r >= 80 ? 'badge-green' : r >= 50 ? 'badge-yellow' : 'badge-red'; }
+
+function openModal(key) {
+  currentUser = userData[key];
+  document.getElementById('modal-title').textContent = 'Meal Log – ' + currentUser.name;
+  document.getElementById('modal-email').textContent = currentUser.email;
+
+  // Build today's meals table
+  var html = '<table><thead><tr><th>Meal</th><th>Food Items</th><th>Calories</th><th>Time</th><th>Status</th></tr></thead><tbody>';
+  currentUser.meals.forEach(function(m) {
+    html += '<tr><td>' + m.type + '</td>';
+    html += '<td class="text-gray text-sm">' + m.food + '</td>';
+    html += '<td>' + m.cal + ' kcal</td>';
+    html += '<td class="text-gray text-sm">' + m.time + (m.takenAt ? '<br><span style="color:#999;font-size:0.7rem;">Taken: '+m.takenAt+'</span>' : '') + '</td>';
+    html += '<td>' + (m.taken
+      ? '<span class="badge badge-green">Done</span>'
+      : '<span class="badge badge-red">Missed</span>') + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('modal-meals-table').innerHTML = html;
+
+  // Build week data
+  var w = currentUser.week;
+  var avgRate = Math.round(w.reduce(function(s,d){return s+d.rate;},0)/w.length);
+  var totalDone = w.reduce(function(s,d){return s+d.done;},0);
+  var totalMeals = w.reduce(function(s,d){return s+d.total;},0);
+  var avgCals = Math.round(w.reduce(function(s,d){return s+d.cals;},0)/w.length);
+
+  document.getElementById('week-avg-compliance').textContent = avgRate + '%';
+  document.getElementById('week-avg-compliance').style.color = rateColor(avgRate);
+  document.getElementById('week-compliance-bar').style.width = avgRate + '%';
+  document.getElementById('week-compliance-bar').style.backgroundColor = rateColor(avgRate);
+  document.getElementById('week-meals-done').textContent = totalDone;
+  document.getElementById('week-meals-total').textContent = 'of ' + totalMeals + ' total';
+  document.getElementById('week-avg-cals').textContent = avgCals;
+  document.getElementById('week-target').textContent = 'Target: ' + currentUser.targetCals + ' kcal';
+
+  // Bar chart
+  var chartHtml = '';
+  w.forEach(function(d) {
+    var h = Math.round((d.rate/100)*72);
+    chartHtml += '<div class="bar-chart-col">';
+    chartHtml += '<span class="bar-chart-value" style="color:'+rateColor(d.rate)+';">'+d.rate+'%</span>';
+    chartHtml += '<div class="bar-chart-track"><div style="height:'+h+'px;background:'+rateColor(d.rate)+';width:100%;border-radius:2px 2px 0 0;"></div></div>';
+    chartHtml += '<span class="bar-chart-label">'+d.day+'</span>';
+    chartHtml += '</div>';
+  });
+  document.getElementById('week-bar-chart').innerHTML = chartHtml;
+
+  // Week table
+  var tbodyHtml = '';
+  w.forEach(function(d) {
+    tbodyHtml += '<tr>';
+    tbodyHtml += '<td style="padding:0.75rem 1rem;"><div class="text-sm">'+d.date+'</div><div style="font-size:0.65rem;color:#999;">'+d.day+'</div></td>';
+    tbodyHtml += '<td style="padding:0.75rem 1rem;" class="text-sm">'+d.done+'/'+d.total+'</td>';
+    tbodyHtml += '<td style="padding:0.75rem 1rem;"><div class="text-sm">'+d.cals+' kcal</div><div style="font-size:0.65rem;color:#999;">Target: '+currentUser.targetCals+'</div></td>';
+    tbodyHtml += '<td style="padding:0.75rem 1rem;"><div class="flex items-center gap-2"><div style="width:4rem;background:#e0e0e0;border-radius:9999px;height:0.375rem;"><div style="width:'+d.rate+'%;background:'+rateColor(d.rate)+';border-radius:9999px;height:0.375rem;"></div></div><span class="text-sm" style="color:'+rateColor(d.rate)+'">' + d.rate + '%</span></div></td>';
+    tbodyHtml += '<td style="padding:0.75rem 1rem;"><span class="badge '+rateBadge(d.rate)+'">'+rateLabel(d.rate)+'</span></td>';
+    tbodyHtml += '</tr>';
+  });
+  document.getElementById('week-table-body').innerHTML = tbodyHtml;
+
+  // Show first tab
+  switchTab('today', document.querySelector('.tab-btn'));
+  document.getElementById('meal-modal').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('meal-modal').classList.add('hidden');
+}
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// Close on backdrop click
+document.getElementById('meal-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+
+</body>
+</html>

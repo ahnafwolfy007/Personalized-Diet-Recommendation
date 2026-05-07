@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DietSync – Register</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem;">
+
+  <div style="width:100%; max-width:42rem;">
+    <div class="card p-8">
+
+      <!-- Logo -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 justify-center mb-6">
+          <span class="logo-icon" style="width:2.5rem; height:2.5rem;"></span>
+          <span class="font-medium text-xl">DietSync</span>
+        </div>
+        <h1 class="text-2xl text-center mb-2">Register</h1>
+        <p class="text-center text-gray">Create your account and start your health journey</p>
+      </div>
+
+      <!-- Form -->
+      <form id="register-form">
+
+        <div class="grid grid-cols-2 gap-6 mb-6">
+          <div>
+            <label for="name">Name</label>
+            <input type="text" id="name" placeholder="John Doe">
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="user@example.com">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••">
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 mb-6">
+          <div>
+            <label for="age">Age</label>
+            <input type="number" id="age" placeholder="25">
+          </div>
+          <div>
+            <label for="gender">Gender</label>
+            <div class="select-wrapper">
+              <select id="gender">
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+              </select>
+              <span class="select-arrow">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 mb-6">
+          <div>
+            <label for="height">Height (cm)</label>
+            <input type="number" id="height" placeholder="170">
+          </div>
+          <div>
+            <label for="weight">Weight (kg)</label>
+            <input type="number" id="weight" placeholder="70">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="activity">Activity Level</label>
+          <div class="select-wrapper">
+            <select id="activity">
+              <option>Sedentary (little or no exercise)</option>
+              <option>Lightly Active (1-3 days/week)</option>
+              <option>Moderately Active (3-5 days/week)</option>
+              <option>Very Active (6-7 days/week)</option>
+              <option>Extra Active (physical job + exercise)</option>
+            </select>
+            <span class="select-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-w-full py-3">Submit</button>
+      </form>
+
+      <!-- Login link -->
+      <div class="mt-6 text-center">
+        <p class="text-gray">
+          Already have an account?
+          <a href="login.html" class="text-green" style="text-decoration:none;">Login</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('register-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      window.location.href = 'user-dashboard.html';
+    });
+  </script>
+
+</body>
+</html>

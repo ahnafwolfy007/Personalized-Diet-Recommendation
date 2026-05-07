@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DietSync – Profile</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <span class="logo-icon"></span>
+        <span class="logo-text">DietSync</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="user-dashboard.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Dashboard
+      </a>
+      <a href="user-log-food.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="12" y1="11" x2="16" y2="11"/><line x1="12" y1="16" x2="16" y2="16"/><line x1="8" y1="11" x2="8.01" y2="11"/><line x1="8" y1="16" x2="8.01" y2="16"/></svg>
+        Log Food
+      </a>
+      <a href="user-report.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+        Daily Report
+      </a>
+      <a href="user-diet-plan.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="2" x2="3" y2="12"/><path d="M3 12a2 2 0 0 0 4 0V6"/><line x1="5" y1="2" x2="5" y2="6"/><line x1="7" y1="2" x2="7" y2="6"/><line x1="21" y1="2" x2="21" y2="22"/><path d="M17 2a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2v8"/></svg>
+        Diet Plan
+      </a>
+      <a href="user-meal-log.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Meal Log
+      </a>
+      <a href="user-profile.html" class="nav-link active">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="login.html" class="nav-link" style="margin-bottom:0;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="max-w-1200">
+      <h1 class="text-3xl mb-8">Profile</h1>
+
+      <div class="grid grid-cols-2 gap-6">
+
+        <!-- Personal Information -->
+        <div class="card p-6">
+          <h2 class="text-xl mb-6">Personal Information</h2>
+
+          <div class="info-row">
+            <svg class="info-row-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <div>
+              <p class="info-row-label">Name</p>
+              <p class="info-row-value">John Doe</p>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <svg class="info-row-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <div>
+              <p class="info-row-label">Email</p>
+              <p class="info-row-value">john.doe@example.com</p>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <svg class="info-row-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <div>
+              <p class="info-row-label">Age</p>
+              <p class="info-row-value">28 years</p>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <svg class="info-row-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <div>
+              <p class="info-row-label">Gender</p>
+              <p class="info-row-value">Male</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Health Metrics -->
+        <div class="card p-6">
+          <h2 class="text-xl mb-6">Health Metrics</h2>
+
+          <div class="info-row">
+            <svg class="info-row-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.3 8.7 8.7 21.3c-1 1-2.5 1-3.4 0l-2.6-2.6c-1-1-1-2.5 0-3.4L15.3 2.7c1-1 2.5-1 3.4 0l2.6 2.6c1 1 1 2.5 0 3.4Z"/><path d="m7.5 10.5 2 2"/><path d="m10.5 7.5 2 2"/><path d="m13.5 4.5 2 2"/><path d="m4.5 13.5 2 2"/></svg>
+            <div>
+              <p class="info-row-label">Height</p>
+              <p class="info-row-value">175 cm</p>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <svg class="info-row-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><path d="M6.5 8a2 2 0 0 0-1.905 1.46L2.1 18.5A2 2 0 0 0 4 21h16a2 2 0 0 0 1.925-2.54L19.4 9.5A2 2 0 0 0 17.48 8Z"/></svg>
+            <div>
+              <p class="info-row-label">Weight</p>
+              <p class="info-row-value">70 kg</p>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <svg class="info-row-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            <div>
+              <p class="info-row-label">BMI</p>
+              <p class="info-row-value">22.5 (Normal)</p>
+            </div>
+          </div>
+
+          <div class="info-row">
+            <svg class="info-row-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <div>
+              <p class="info-row-label">Activity Level</p>
+              <p class="info-row-value">Moderately Active</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Edit Button -->
+      <div class="mt-6">
+        <button class="btn btn-primary px-6 py-3">Edit Profile</button>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+</body>
+</html>
