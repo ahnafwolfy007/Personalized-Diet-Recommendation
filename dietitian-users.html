@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DietSync – Dietitian Dashboard</title>
-  <link rel="stylesheet" href="./styles/dietitian-dashboard.css">
+  <title>DietSync – Users</title>
+  <link rel="stylesheet" href="./styles/dietitian-users.css">
 </head>
 <body>
 <div class="page-wrapper">
@@ -18,11 +18,11 @@
       </div>
     </div>
     <nav class="sidebar-nav">
-      <a href="dietitian-dashboard.html" class="nav-link active">
+      <a href="dietitian-dashboard.html" class="nav-link">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         Dashboard
       </a>
-      <a href="dietitian-users.html" class="nav-link">
+      <a href="dietitian-users.html" class="nav-link active">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         Users
       </a>
@@ -50,22 +50,25 @@
   <!-- Main Content -->
   <main class="main-content">
     <div class="max-w-1200">
-      <h1 class="text-3xl mb-8">Dietitian Dashboard</h1>
+      <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl">Users</h1>
+        <a href="dietitian-create-plan.html" class="btn btn-primary flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Create Meal Plan
+        </a>
+      </div>
 
-      <!-- Users Table -->
       <div class="bg-white border rounded-lg">
         <div class="p-6 border-b">
-          <h2 class="text-xl">Assigned Users</h2>
-          <p class="text-sm text-gray mt-1">Monitor your users' daily intake and progress</p>
+          <h2 class="text-xl">All Users</h2>
         </div>
         <div class="overflow-x-auto">
           <table>
             <thead>
               <tr>
-                <th>User Name</th>
+                <th>Name</th>
+                <th>Email</th>
                 <th>BMI</th>
-                <th>Calorie Requirement</th>
-                <th>Today's Intake</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
@@ -73,51 +76,53 @@
             <tbody>
               <tr>
                 <td>John Doe</td>
+                <td class="text-gray">john@example.com</td>
                 <td class="text-gray">22.5</td>
-                <td class="text-gray">2,200 kcal</td>
-                <td class="text-gray">2,100 kcal</td>
                 <td><span class="badge badge-green">Normal</span></td>
-                <td><button class="btn-link">View Details</button></td>
+                <td>
+                  <button class="btn-link mr-4">View</button>
+                  <button class="btn-link btn-link-muted">Edit</button>
+                </td>
               </tr>
               <tr>
                 <td>Jane Smith</td>
+                <td class="text-gray">jane@example.com</td>
                 <td class="text-gray">28.3</td>
-                <td class="text-gray">2,000 kcal</td>
-                <td class="text-gray">2,450 kcal</td>
                 <td><span class="badge badge-red">Over Eating</span></td>
-                <td><button class="btn-link">View Details</button></td>
+                <td>
+                  <button class="btn-link mr-4">View</button>
+                  <button class="btn-link btn-link-muted">Edit</button>
+                </td>
               </tr>
               <tr>
                 <td>Mike Johnson</td>
+                <td class="text-gray">mike@example.com</td>
                 <td class="text-gray">19.8</td>
-                <td class="text-gray">2,400 kcal</td>
-                <td class="text-gray">1,800 kcal</td>
                 <td><span class="badge badge-yellow">Under Target</span></td>
-                <td><button class="btn-link">View Details</button></td>
+                <td>
+                  <button class="btn-link mr-4">View</button>
+                  <button class="btn-link btn-link-muted">Edit</button>
+                </td>
               </tr>
               <tr>
                 <td>Sarah Williams</td>
+                <td class="text-gray">sarah@example.com</td>
                 <td class="text-gray">23.1</td>
-                <td class="text-gray">1,900 kcal</td>
-                <td class="text-gray">1,850 kcal</td>
                 <td><span class="badge badge-green">Normal</span></td>
-                <td><button class="btn-link">View Details</button></td>
+                <td>
+                  <button class="btn-link mr-4">View</button>
+                  <button class="btn-link btn-link-muted">Edit</button>
+                </td>
               </tr>
               <tr>
                 <td>Tom Brown</td>
+                <td class="text-gray">tom@example.com</td>
                 <td class="text-gray">30.2</td>
-                <td class="text-gray">2,100 kcal</td>
-                <td class="text-gray">2,600 kcal</td>
                 <td><span class="badge badge-red">Over Eating</span></td>
-                <td><button class="btn-link">View Details</button></td>
-              </tr>
-              <tr>
-                <td>Emily Davis</td>
-                <td class="text-gray">21.5</td>
-                <td class="text-gray">1,800 kcal</td>
-                <td class="text-gray">1,750 kcal</td>
-                <td><span class="badge badge-green">Normal</span></td>
-                <td><button class="btn-link">View Details</button></td>
+                <td>
+                  <button class="btn-link mr-4">View</button>
+                  <button class="btn-link btn-link-muted">Edit</button>
+                </td>
               </tr>
             </tbody>
           </table>

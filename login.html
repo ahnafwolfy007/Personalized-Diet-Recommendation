@@ -1,99 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login – DietSync</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DietSync – Login</title>
+  <link rel="stylesheet" href="./styles/login.css">
 </head>
 <body class="auth-page">
 
-    <div class="auth-topbar">
-        <div class="auth-topbar-logo">
-            <div class="logo-icon">D</div>
-            DietSync
+  <div class="auth-wrap">
+    <div class="card p-8">
+
+      <!-- Logo -->
+      <div class="mb-8">
+        <div class="flex items-center gap-2 justify-center mb-6">
+          <a href="index.html" class="logo-icon logo-large"></a>
         </div>
-        <a href="index.html" class="auth-link">&#8592; Back to Home</a>
-    </div>
+        <h1 class="text-2xl text-center mb-2">Login</h1>
+        <p class="text-center text-gray">Enter your credentials to continue</p>
+      </div>
 
-    <div class="auth-body">
-        <div class="auth-card">
-
-            <div class="auth-icon-row">
-                <div class="auth-icon-box">&#127807;</div>
-            </div>
-
-            <h2 class="text-center mb-8">Welcome Back</h2>
-            <p class="auth-subtitle text-center">Sign in to your DietSync account</p>
-
-            <!-- form doesnt really submit anywhere, links are just for demo -->
-            <form>
-
-                <div class="form-group">
-                    <label class="form-label" for="email">Email Address</label>
-                    <input
-                        class="form-control"
-                        type="email"
-                        id="email"
-                        placeholder="e.g. john@email.com"
-                        value="john.doe@email.com"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
-                    <input
-                        class="form-control"
-                        type="password"
-                        id="password"
-                        placeholder="Enter your password"
-                        value="••••••••"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="role">Login As</label>
-                    <select class="form-control" id="role">
-                        <option value="">Select Role</option>
-                        <option value="user" selected>User</option>
-                        <option value="dietitian">Dietitian</option>
-                        <option value="admin">Admin</option>
-                    </select>
-                </div>
-
-                <div class="forgot-row">
-                    <a href="#">Forgot password?</a>
-                </div>
-
-                <a href="user-dashboard.html" class="btn btn-primary btn-full mb-8">
-                    Sign In
-                </a>
-
-                <div class="form-divider">or</div>
-
-                <div class="register-note">
-                    Don't have an account?
-                    <a href="register.html" class="auth-strong">Register here</a>
-                </div>
-
-            </form>
-
-            <!-- shortcut buttons so you can click around the prototype fast -->
-            <div class="quick-login">
-                <p class="quick-login-title">Quick Login (Prototype)</p>
-                <div class="stack-8">
-                    <a href="user-dashboard.html" class="btn btn-ghost btn-sm">&#128100; Login as User</a>
-                    <a href="dietitian-dashboard.html" class="btn btn-ghost btn-sm">&#128104;&#8205;&#9877;&#65039; Login as Dietitian</a>
-                    <a href="admin-dashboard.html" class="btn btn-ghost btn-sm">&#128737; Login as Admin</a>
-                </div>
-            </div>
-
+      <!-- Form -->
+      <form id="login-form" action="user-dashboard.html">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="user@example.com">
         </div>
-    </div>
 
-    <div class="auth-foot">
-        <small>&copy; 2026 DietSync — Student Project Prototype</small>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••">
+        </div>
+
+        <div class="form-group">
+          <label for="login-as">Login As</label>
+          <div class="select-wrapper">
+            <select id="login-as">
+              <option value="Patient">Patient</option>
+              <option value="Dietitian">Dietitian</option>
+              <option value="Admin">Admin</option>
+            </select>
+            <span class="select-arrow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-w-full py-3">Login</button>
+      </form>
+
+      <!-- Register link -->
+      <div class="mt-6 text-center">
+        <p class="text-gray">
+          Don't have an account?
+          <a href="register.html" class="text-green link-clean">Register</a>
+        </p>
+      </div>
+
     </div>
+  </div>
 
 </body>
 </html>

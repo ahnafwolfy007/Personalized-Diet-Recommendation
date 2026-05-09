@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DietSync – Meal Log</title>
+  <link rel="stylesheet" href="./styles/user-meal-log.css">
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <a href="index.html" class="logo-icon"></a>
+        <span class="logo-text">DietSync</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="user-dashboard.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Dashboard
+      </a>
+      <a href="user-log-food.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><line x1="12" y1="11" x2="16" y2="11"/><line x1="12" y1="16" x2="16" y2="16"/><line x1="8" y1="11" x2="8.01" y2="11"/><line x1="8" y1="16" x2="8.01" y2="16"/></svg>
+        Log Food
+      </a>
+      <a href="user-report.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+        Daily Report
+      </a>
+      <a href="user-diet-plan.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="2" x2="3" y2="12"/><path d="M3 12a2 2 0 0 0 4 0V6"/><line x1="5" y1="2" x2="5" y2="6"/><line x1="7" y1="2" x2="7" y2="6"/><line x1="21" y1="2" x2="21" y2="22"/><path d="M17 2a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2v8"/></svg>
+        Diet Plan
+      </a>
+      <a href="user-meal-log.html" class="nav-link active">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        Meal Log
+      </a>
+      <a href="user-profile.html" class="nav-link">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="login.html" class="nav-link logout">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container-narrow">
+
+      <!-- Header -->
+      <div class="flex items-center gap-3 mb-8">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>
+        <div>
+          <h1 class="text-3xl">Meal Log</h1>
+          <p class="text-gray text-sm mt-1">Track your daily meal plan compliance</p>
+        </div>
+      </div>
+
+      <!-- Date Selector -->
+      <div class="bg-white border rounded-lg p-5 mb-6 flex items-center gap-4">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <label class="text-sm text-gray label-inline">Viewing date:</label>
+        <input type="date" value="2026-03-29" class="input-inline">
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-3 gap-6 mb-6">
+        <div class="card p-6">
+          <div class="text-gray text-sm mb-2">Completion Rate</div>
+          <div class="text-3xl mb-1" id="completion-rate">50%</div>
+          <div class="progress-bar">
+            <div class="progress-bar-fill w-50" id="completion-bar"></div>
+          </div>
+          <div class="text-sm text-gray mt-2" id="meals-done">2 of 4 meals completed</div>
+        </div>
+        <div class="card p-6">
+          <div class="text-gray text-sm mb-2">Calories Consumed</div>
+          <div class="text-3xl mb-1" id="cals-consumed">800 <span class="text-lg text-gray">kcal</span></div>
+          <div class="text-sm text-gray mt-3">Target: 1,500 kcal</div>
+          <div class="text-sm text-green mt-1" id="cals-remaining">700 kcal remaining</div>
+        </div>
+        <div class="card p-6">
+          <div class="text-gray text-sm mb-2">Remaining Meals</div>
+          <div class="text-3xl mb-1" id="remaining-meals">2</div>
+          <div class="text-sm text-gray mt-3">Pending today</div>
+        </div>
+      </div>
+
+      <!-- Meal Plan List -->
+      <div class="bg-white border rounded-lg overflow-hidden mb-6">
+        <div class="p-6 border-b">
+          <h2 class="text-xl">Today's Meal Plan — Monday, Mar 29</h2>
+        </div>
+
+        <!-- Meal rows (id, calories, initial-taken) -->
+        <div id="meal-list">
+
+          <div class="meal-row completed" data-calories="320" data-taken="true">
+            <button class="checkbox-btn checked" onclick="toggleMeal(this)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-1">
+                <span>Breakfast</span>
+                <span class="text-sm text-gray">08:00 AM</span>
+                <span class="badge badge-green">Completed</span>
+              </div>
+              <div class="text-sm text-gray mb-1">Oatmeal (50g), Banana (1), Almonds (10)</div>
+              <div class="text-xs text-muted-light">320 kcal</div>
+            </div>
+            <div class="status-icon status-icon-success">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+
+          <div class="meal-row completed" data-calories="480" data-taken="true">
+            <button class="checkbox-btn checked" onclick="toggleMeal(this)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-1">
+                <span>Lunch</span>
+                <span class="text-sm text-gray">01:00 PM</span>
+                <span class="badge badge-green">Completed</span>
+              </div>
+              <div class="text-sm text-gray mb-1">Chicken Breast (150g), Rice (100g), Broccoli (80g)</div>
+              <div class="text-xs text-muted-light">480 kcal</div>
+            </div>
+            <div class="status-icon status-icon-success">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </div>
+
+          <div class="meal-row" data-calories="180" data-taken="false">
+            <button class="checkbox-btn" onclick="toggleMeal(this)"></button>
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-1">
+                <span>Snack</span>
+                <span class="text-sm text-gray">04:00 PM</span>
+              </div>
+              <div class="text-sm text-gray mb-1">Apple (1), Greek Yogurt (100g)</div>
+              <div class="text-xs text-muted-light">180 kcal</div>
+            </div>
+            <div class="status-icon status-icon-danger">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+          </div>
+
+          <div class="meal-row" data-calories="520" data-taken="false">
+            <button class="checkbox-btn" onclick="toggleMeal(this)"></button>
+            <div class="flex-1">
+              <div class="flex items-center gap-3 mb-1">
+                <span>Dinner</span>
+                <span class="text-sm text-gray">07:00 PM</span>
+              </div>
+              <div class="text-sm text-gray mb-1">Salmon (120g), Quinoa (80g), Mixed Vegetables (100g)</div>
+              <div class="text-xs text-muted-light">520 kcal</div>
+            </div>
+            <div class="status-icon status-icon-danger">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Notes Section -->
+      <div class="card p-6">
+        <h3 class="mb-4">Daily Notes</h3>
+        <textarea id="notes-area" class="notes-area" placeholder="Add notes about your meals, how you felt, cravings, etc..."></textarea>
+        <div class="flex gap-3 mt-4">
+          <button onclick="alert('Notes saved!')" class="btn btn-primary btn-sm">Save Notes</button>
+          <button onclick="document.getElementById('notes-area').value=''" class="btn btn-secondary btn-sm">Clear</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+
+</body>
+</html>

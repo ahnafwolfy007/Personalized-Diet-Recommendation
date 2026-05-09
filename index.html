@@ -1,175 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DietSync – Personalized Diet Recommendation System</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DietSync – Personalized Diet Recommendation System</title>
+  <link rel="stylesheet" href="./styles/index.css">
 </head>
 <body>
 
-    <!-- this is just static html+css for our project prototype (no js) -->
-
-    <!-- top menu: flex in style.css class .navbar -->
-    <div class="navbar">
-        <div class="navbar-logo">
-            <div class="logo-icon">D</div>
-            DietSync
-        </div>
-        <div class="navbar-links">
-            <a href="#">Home</a>
-            <a href="#">Features</a>
-            <a href="#">About</a>
-        </div>
-        <div class="navbar-actions">
-            <a href="login.html" class="btn btn-outline">Login</a>
-            <a href="register.html" class="btn btn-primary">Register</a>
-        </div>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="flex items-center gap-2">
+        <a href="index.html" class="logo-icon"></a>
+        <span class="logo-text">DietSync</span>
+      </div>
+      <div class="flex gap-4">
+        <a href="login.html" class="btn btn-secondary px-6 py-2">Login</a>
+        <a href="register.html" class="btn btn-primary px-6 py-2">Register</a>
+      </div>
     </div>
+  </nav>
 
-    <section class="hero">
-        <div class="hero-content">
-            <p class="hero-badge">&#127807; Smart Nutrition Intelligence</p>
-            <h1 class="hero-title">
-                Your <span>Personalized</span><br>Diet, Made Simple
-            </h1>
-            <p class="hero-description">
-                DietSync analyzes your body metrics and daily food intake to
-                generate a tailored diet plan — reviewed by certified dietitians
-                to help you reach your health goals.
-            </p>
-            <div class="hero-actions">
-                <a href="register.html" class="btn btn-primary btn-lg">Get Started Free</a>
-                <a href="login.html" class="btn btn-ghost btn-lg">Login</a>
-            </div>
-        </div>
-        <div class="hero-illustration">
-            <div class="illus-icon">&#127807;</div>
-            <span>Hero Illustration Placeholder</span>
-            <small class="hero-illus-note">480 × 320</small>
-        </div>
-    </section>
-
-    <section class="section" id="features">
-        <div class="section-header">
-            <p class="section-label">Features</p>
-            <h2>Everything You Need to Stay Healthy</h2>
-            <p>A complete toolkit for managing your daily nutrition goals.</p>
-        </div>
-
-        <!-- 4 cards in a grid (see .features-grid in css) -->
-        <div class="features-grid">
-
-            <div class="feature-card">
-                <div class="feature-icon">&#128203;</div>
-                <h3>Track Food Intake</h3>
-                <p>Log your meals quickly and accurately. Choose from a library of common foods with pre-filled calorie data.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">&#128200;</div>
-                <h3>Daily Calorie Reports</h3>
-                <p>Visual daily summaries showing your intake vs. your calorie target — keep yourself accountable every day.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">&#128214;</div>
-                <h3>Personalized Diet Plans</h3>
-                <p>Plans built around your BMI, age, weight, and activity level. No generic meal schedules — only your data.</p>
-            </div>
-
-            <div class="feature-card">
-                <div class="feature-icon">&#128104;&#8205;&#9877;&#65039;</div>
-                <h3>Dietitian Feedback</h3>
-                <p>Certified dietitians review your progress and update your meal plan with personalized notes and suggestions.</p>
-            </div>
-
-        </div>
-    </section>
-
-    <section class="section about-section" id="about">
-        <div class="about-grid">
-            <div class="about-block">
-                <p class="section-label">About the System</p>
-                <h2 class="about-heading">Built for Students, Powered by Science</h2>
-                <p class="about-lead">
-                    DietSync is a student project developed to demonstrate how technology can
-                    simplify clinical nutrition management. It connects users, dietitians, and
-                    administrators in a unified digital platform.
-                </p>
-
-                <div class="check-list">
-                    <div class="check-item">
-                        <span class="check-icon">&#10003;</span>
-                        BMI-based calorie target calculation
-                    </div>
-                    <div class="check-item">
-                        <span class="check-icon">&#10003;</span>
-                        Real-time food logging with instant calorie feedback
-                    </div>
-                    <div class="check-item">
-                        <span class="check-icon">&#10003;</span>
-                        Role-based access for Users, Dietitians &amp; Admins
-                    </div>
-                    <div class="check-item">
-                        <span class="check-icon">&#10003;</span>
-                        Clean daily reports with progress tracking
-                    </div>
-                    <div class="check-item">
-                        <span class="check-icon">&#10003;</span>
-                        Dietitian-created meal plans per user
-                    </div>
-                </div>
-            </div>
-            <div class="about-illustration">
-                <div class="illus-icon">&#128202;</div>
-                <span>About Illustration Placeholder</span>
-                <small class="hero-illus-note">480 × 280</small>
-            </div>
-        </div>
-    </section>
-
-    <section class="section section-white">
-        <div class="section-header">
-            <p class="section-label">How It Works</p>
-            <h2>Three Steps to Better Nutrition</h2>
-        </div>
-        <div class="grid-3">
-
-            <div class="step-block">
-                <div class="step-num">1</div>
-                <h4>Create Your Profile</h4>
-                <p>Enter your body metrics — age, weight, height, and activity level — to generate your calorie target.</p>
-            </div>
-
-            <div class="step-block">
-                <div class="step-num">2</div>
-                <h4>Log Your Meals</h4>
-                <p>Record what you eat throughout the day. The system calculates calories and compares against your goal.</p>
-            </div>
-
-            <div class="step-block">
-                <div class="step-num">3</div>
-                <h4>Get Your Plan</h4>
-                <p>Your assigned dietitian reviews your data and crafts a personalized meal plan tailored for your goals.</p>
-            </div>
-
-        </div>
-    </section>
-
-    <div class="footer">
-        <div class="footer-logo">
-            <div class="footer-mark">D</div>
-            DietSync
-        </div>
-        <p class="footer-copy">
-            &copy; 2026 DietSync &mdash; Personalized Diet Recommendation System &mdash; Student Project
-        </p>
-        <div class="footer-links">
-            <a href="login.html">Login</a>
-            <a href="register.html">Register</a>
-        </div>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="text-5xl mb-6">Track your nutrition and receive personalized diet plans.</h1>
+      <p class="text-xl text-gray mb-8">
+        Monitor your daily calorie intake, get personalized meal recommendations,
+        and receive expert guidance from professional dietitians.
+      </p>
+      <div class="flex gap-4 justify-center">
+        <a href="login.html" class="btn btn-secondary px-8 py-3">Login</a>
+        <a href="register.html" class="btn btn-primary px-8 py-3">Register</a>
+      </div>
     </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features">
+    <div class="grid grid-cols-4 gap-6">
+
+      <div class="card p-8">
+        <div class="icon-box-lg mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+               stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="8" y="2" width="8" height="4" rx="1"/>
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+            <line x1="12" y1="11" x2="16" y2="11"/><line x1="12" y1="16" x2="16" y2="16"/>
+            <line x1="8" y1="11" x2="8.01" y2="11"/><line x1="8" y1="16" x2="8.01" y2="16"/>
+          </svg>
+        </div>
+        <h3 class="text-xl mb-2">Track Food Intake</h3>
+        <p class="text-gray">Log your daily meals and monitor your nutritional intake effortlessly.</p>
+      </div>
+
+      <div class="card p-8">
+        <div class="icon-box-lg mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+               stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3v18h18"/>
+            <path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>
+          </svg>
+        </div>
+        <h3 class="text-xl mb-2">Daily Calorie Reports</h3>
+        <p class="text-gray">View detailed reports of your daily calorie consumption and progress.</p>
+      </div>
+
+      <div class="card p-8">
+        <div class="icon-box-lg mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+               stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <h3 class="text-xl mb-2">Personalized Diet Plans</h3>
+        <p class="text-gray">Receive customized meal plans tailored to your health goals.</p>
+      </div>
+
+      <div class="card p-8">
+        <div class="icon-box-lg mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+               stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl mb-2">Dietitian Feedback</h3>
+        <p class="text-gray">Get professional advice and feedback from certified dietitians.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t mt-24">
+    <div class="footer-inner">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <a href="index.html" class="logo-icon"></a>
+          <span class="font-medium">DietSync</span>
+        </div>
+        <p class="text-gray">© 2026 DietSync — Personalized Diet Recommendation System</p>
+      </div>
+    </div>
+  </footer>
 
 </body>
 </html>
