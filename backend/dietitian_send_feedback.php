@@ -3,6 +3,7 @@
 // Saves a dietitian's response to a patient's feedback
 
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/helpers.php';
 
 $dietitian_id = require_role('dietitian');
 require_post();
@@ -23,6 +24,7 @@ $affected = $stmt->affected_rows;
 $stmt->close();
 
 if ($affected > 0) {
+    log_activity($conn, $dietitian_id, 'dietitian', 'respond_feedback', 'Answered feedback #' . $feedback_id);
     json_response(['success' => true, 'message' => 'Response sent.']);
 } else {
     json_response(['success' => false, 'message' => 'Feedback not found or already answered.'], 404);

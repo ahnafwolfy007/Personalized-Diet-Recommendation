@@ -30,12 +30,26 @@ include __DIR__ . '/partials/head.php';
                      aria-controls="food-options" aria-autocomplete="list">
               <ul class="combo-list hidden" id="food-options" role="listbox" aria-label="Food results"></ul>
             </div>
-            <p class="text-xs text-gray mt-1">Start typing to search 200+ foods, or pick from the list on the right.</p>
+            <p class="text-xs text-gray mt-1">Your most-used foods appear first. Start typing to search.</p>
           </div>
 
+          <!-- Amount + unit -->
           <div class="form-group">
-            <label for="quantity">Quantity (grams)</label>
-            <input type="number" id="quantity" value="100" min="1" placeholder="100">
+            <label for="serving-amount">Amount</label>
+            <div class="flex gap-3">
+              <input type="number" id="serving-amount" value="100" min="0.1" step="0.1" placeholder="100" style="flex:1;">
+              <div class="select-wrapper" style="flex:1;">
+                <select id="serving-unit">
+                  <option value="g">Grams (g)</option>
+                  <option value="portion">Portion</option>
+                  <option value="glass">Glass</option>
+                  <option value="tbsp">Table-spoon</option>
+                  <option value="tsp">Tea-spoon</option>
+                </select>
+                <span class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </div>
+            </div>
+            <p class="text-xs text-gray mt-1" id="unit-hint">Standard amounts: 1 portion = 150g · 1 glass = 250g · 1 tbsp = 15g · 1 tsp = 5g.</p>
           </div>
 
           <!-- Live calorie preview -->
@@ -49,6 +63,29 @@ include __DIR__ . '/partials/head.php';
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Add Food
           </button>
+
+          <!-- Add a missing food -->
+          <div class="mt-6 border-t" style="padding-top:1rem;">
+            <button type="button" id="toggle-add-food" class="btn-link">+ Can't find it? Add a food</button>
+            <div id="add-food-form" class="hidden mt-4">
+              <div class="form-group">
+                <label for="nf-name">Food name</label>
+                <input type="text" id="nf-name" placeholder="e.g. Homemade lentil curry" maxlength="150">
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="form-group">
+                  <label for="nf-cals">Calories per 100g</label>
+                  <input type="number" id="nf-cals" min="1" max="1000" step="0.1" placeholder="120">
+                </div>
+                <div class="form-group">
+                  <label for="nf-cat">Category</label>
+                  <input type="text" id="nf-cat" placeholder="General" maxlength="50">
+                </div>
+              </div>
+              <button type="button" id="save-food-btn" class="btn btn-secondary btn-sm">Save food</button>
+              <p class="text-xs text-gray mt-2">New foods are marked <span class="badge badge-yellow">Unverified</span> until an admin reviews them.</p>
+            </div>
+          </div>
         </div>
 
         <!-- Food Database Table -->
@@ -105,6 +142,10 @@ include __DIR__ . '/partials/head.php';
 </div>
 
 <script>
+  // Standard unit→grams factors (must match backend serving_units()).
+  var UNIT_GRAMS = { g: 1, portion: 150, glass: 250, tbsp: 15, tsp: 5 };
+  var UNIT_LABEL = { g: 'g', portion: 'portion', glass: 'glass', tbsp: 'tbsp', tsp: 'tsp' };
+
   var allFoods = [];
   var selectedFood = null;
   var activeIndex = -1;
@@ -112,25 +153,42 @@ include __DIR__ . '/partials/head.php';
 
   var searchInput = document.getElementById('food-search');
   var optionsList = document.getElementById('food-options');
+  var amountInput = document.getElementById('serving-amount');
+  var unitSelect  = document.getElementById('serving-unit');
 
-  // Load all foods from backend
-  fetch('../backend/get_foods.php')
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (!data.success) return;
-      allFoods = data.foods;
+  function unverifiedBadge(f) {
+    return Number(f.is_verified) === 0
+      ? ' <span class="badge badge-yellow" style="font-size:0.65rem;">Unverified</span>' : '';
+  }
 
-      var tbody = document.getElementById('food-db-table');
-      tbody.innerHTML = data.foods.map(function(f) {
-        return '<tr class="food-row" data-id="' + Number(f.food_id) + '" style="cursor:pointer">' +
-               '<td>' + escapeHtml(f.name) + '</td><td class="text-gray">' + escapeHtml(f.category) + '</td>' +
-               '<td class="text-right">' + escapeHtml(f.calories_per_100g) + ' kcal</td></tr>';
-      }).join('');
-    })
-    .catch(function() {
-      document.getElementById('food-db-table').innerHTML =
-        '<tr><td colspan="3" class="text-center text-gray">Could not load foods.</td></tr>';
-    });
+  function renderFoodTable() {
+    var tbody = document.getElementById('food-db-table');
+    if (allFoods.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="3" class="text-center text-gray">No foods yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = allFoods.map(function(f) {
+      return '<tr class="food-row" data-id="' + Number(f.food_id) + '" style="cursor:pointer">' +
+             '<td>' + escapeHtml(f.name) + unverifiedBadge(f) + '</td>' +
+             '<td class="text-gray">' + escapeHtml(f.category) + '</td>' +
+             '<td class="text-right">' + escapeHtml(f.calories_per_100g) + ' kcal</td></tr>';
+    }).join('');
+  }
+
+  function loadFoods() {
+    fetch('../backend/get_foods.php')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.success) return;
+        allFoods = data.foods;
+        renderFoodTable();
+      })
+      .catch(function() {
+        document.getElementById('food-db-table').innerHTML =
+          '<tr><td colspan="3" class="text-center text-gray">Could not load foods.</td></tr>';
+      });
+  }
+  loadFoods();
 
   // ── Combobox search ─────────────────────────────────
   function renderOptions(list) {
@@ -139,7 +197,7 @@ include __DIR__ . '/partials/head.php';
     } else {
       optionsList.innerHTML = list.map(function(f, i) {
         return '<li class="combo-option' + (i === activeIndex ? ' active' : '') + '" role="option" data-i="' + i + '" aria-selected="' + (i === activeIndex) + '">' +
-               '<span>' + escapeHtml(f.name) + '</span>' +
+               '<span>' + escapeHtml(f.name) + unverifiedBadge(f) + '</span>' +
                '<span class="combo-cat">' + escapeHtml(f.category) + ' · ' + escapeHtml(f.calories_per_100g) + ' kcal</span>' +
                '</li>';
       }).join('');
@@ -174,7 +232,7 @@ include __DIR__ . '/partials/head.php';
   }
 
   searchInput.addEventListener('input', function() {
-    selectedFood = null; // typing invalidates a prior pick
+    selectedFood = null;
     openSearch(this.value);
     updateCalcPreview();
   });
@@ -189,7 +247,6 @@ include __DIR__ . '/partials/head.php';
   });
 
   optionsList.addEventListener('mousedown', function(e) {
-    // mousedown (not click) so it fires before the input blur
     var li = e.target.closest('.combo-option');
     if (!li) return;
     e.preventDefault();
@@ -212,29 +269,33 @@ include __DIR__ . '/partials/head.php';
 
   // ── Live calorie preview ────────────────────────────
   function updateCalcPreview() {
-    var qty = parseFloat(document.getElementById('quantity').value) || 0;
+    var amount = parseFloat(amountInput.value) || 0;
+    var unit   = unitSelect.value;
+    var grams  = amount * (UNIT_GRAMS[unit] || 1);
     var calPer100 = selectedFood ? parseFloat(selectedFood.calories_per_100g) : 0;
-    if (calPer100 > 0 && qty > 0) {
-      var cal = ((calPer100 / 100) * qty).toFixed(1);
+    if (calPer100 > 0 && grams > 0) {
+      var cal = ((calPer100 / 100) * grams).toFixed(1);
       document.getElementById('calc-calories').textContent = cal + ' kcal';
-      document.getElementById('calc-desc').textContent     = qty + 'g × ' + calPer100 + ' kcal/100g';
+      var unitDesc = unit === 'g' ? amount + 'g' : (amount + ' ' + UNIT_LABEL[unit] + ' = ' + grams.toFixed(0) + 'g');
+      document.getElementById('calc-desc').textContent = unitDesc + ' × ' + calPer100 + ' kcal/100g';
       document.getElementById('calc-result').classList.remove('hidden');
     } else {
       document.getElementById('calc-result').classList.add('hidden');
     }
   }
-  document.getElementById('quantity').addEventListener('input', updateCalcPreview);
+  amountInput.addEventListener('input', updateCalcPreview);
+  unitSelect.addEventListener('change', updateCalcPreview);
 
-  // ── Add food ────────────────────────────────────────
+  // ── Add food to log ─────────────────────────────────
   document.getElementById('add-btn').addEventListener('click', function() {
-    var quantity = document.getElementById('quantity').value;
-
+    var amount = parseFloat(amountInput.value);
     if (!selectedFood) { showToast('Please search and select a food first.', 'error'); searchInput.focus(); return; }
-    if (!quantity || quantity <= 0) { showToast('Please enter a valid quantity.', 'error'); return; }
+    if (!amount || amount <= 0) { showToast('Please enter a valid amount.', 'error'); return; }
 
     var formData = new FormData();
     formData.append('food_id', selectedFood.food_id);
-    formData.append('quantity', quantity);
+    formData.append('serving_unit', unitSelect.value);
+    formData.append('serving_amount', amount);
 
     fetch('../backend/log_food.php', { method: 'POST', body: formData })
       .then(function(r) { return r.json(); })
@@ -245,11 +306,49 @@ include __DIR__ . '/partials/head.php';
           searchInput.value = '';
           document.getElementById('calc-result').classList.add('hidden');
           loadTodayLog();
+          loadFoods(); // refresh so the smart-sort moves it up
         } else {
           showToast(data.message || 'Could not log food.', 'error');
         }
       })
       .catch(function() { showToast('Network error. Please try again.', 'error'); });
+  });
+
+  // ── Add a missing food ──────────────────────────────
+  document.getElementById('toggle-add-food').addEventListener('click', function() {
+    document.getElementById('add-food-form').classList.toggle('hidden');
+  });
+
+  document.getElementById('save-food-btn').addEventListener('click', function() {
+    var name = document.getElementById('nf-name').value.trim();
+    var cals = document.getElementById('nf-cals').value;
+    var cat  = document.getElementById('nf-cat').value.trim() || 'General';
+    if (!name) { showToast('Enter a food name.', 'error'); return; }
+    if (!cals || cals <= 0) { showToast('Enter calories per 100g.', 'error'); return; }
+
+    var fd = new FormData();
+    fd.append('name', name);
+    fd.append('calories_per_100g', cals);
+    fd.append('category', cat);
+
+    var btn = this;
+    btn.disabled = true;
+    fetch('../backend/add_food.php', { method: 'POST', body: fd })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        btn.disabled = false;
+        showToast(data.message, data.success ? 'success' : 'error');
+        if (data.success && data.food) {
+          allFoods.unshift(data.food);
+          renderFoodTable();
+          chooseFood(data.food);
+          document.getElementById('nf-name').value = '';
+          document.getElementById('nf-cals').value = '';
+          document.getElementById('nf-cat').value  = '';
+          document.getElementById('add-food-form').classList.add('hidden');
+        }
+      })
+      .catch(function() { btn.disabled = false; showToast('Network error. Please try again.', 'error'); });
   });
 
   // ── Today's food log ────────────────────────────────
@@ -268,7 +367,7 @@ include __DIR__ . '/partials/head.php';
         tbody.innerHTML = data.logs.map(function(log) {
           total += parseFloat(log.calories_consumed);
           return '<tr><td>' + escapeHtml(log.food_name) + '</td>' +
-                 '<td class="text-gray">' + escapeHtml(log.quantity_g) + 'g</td>' +
+                 '<td class="text-gray">' + escapeHtml(log.amount_label) + '</td>' +
                  '<td class="text-right">' + escapeHtml(log.calories_consumed) + ' kcal</td>' +
                  '<td class="text-gray">' + escapeHtml(log.time) + '</td>' +
                  '<td class="text-right"><button class="row-action js-del" data-id="' + Number(log.log_id) + '" title="Remove entry" aria-label="Remove ' + escapeHtml(log.food_name) + '">' +

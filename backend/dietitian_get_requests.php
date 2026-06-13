@@ -8,7 +8,7 @@ $dietitian_id = require_role('dietitian');
 
 $stmt = $conn->prepare("
     SELECT r.request_id, r.status, r.created_at,
-           u.name AS patient_name, u.age, u.gender
+           u.user_id AS patient_id, u.name AS patient_name, u.age, u.gender
     FROM dietitian_requests r
     JOIN users u ON u.user_id = r.patient_id
     WHERE r.dietitian_id = ? AND r.status = 'pending'

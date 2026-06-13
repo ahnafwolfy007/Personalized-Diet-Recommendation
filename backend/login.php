@@ -1,41 +1,35 @@
 <?php
 // backend/login.php
-// Handles login form submission from frontend/login.php
+// Handles login form submission from frontend/login.php.
+// Email + password only — the role is derived from the account, not supplied
+// by the client (a user cannot pick which role to log in as).
 
-require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/helpers.php';
 
-header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method.']);
-    exit;
-}
+require_post();
 
 $email    = trim($_POST['email'] ?? '');
 $password = (string) ($_POST['password'] ?? '');
-$role     = trim($_POST['role'] ?? '');
 
-if ($email === '' || $password === '' || $role === '') {
-    echo json_encode(['success' => false, 'message' => 'Please fill in all fields.']);
-    exit;
+if ($email === '' || $password === '') {
+    json_response(['success' => false, 'message' => 'Please enter your email and password.']);
 }
 
-// Find user by email and role
-$stmt = $conn->prepare("SELECT user_id, name, email, password, role, status FROM users WHERE email = ? AND role = ?");
-$stmt->bind_param('ss', $email, $role);
+// Find user by email only; the role comes from the stored account.
+$stmt = $conn->prepare("SELECT user_id, name, email, password, role, status FROM users WHERE email = ?");
+$stmt->bind_param('s', $email);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-// Single generic message for bad email/role/password to avoid account enumeration.
+// Single generic message for a bad email or password to avoid account enumeration.
 if (!$user || !password_verify($password, $user['password'])) {
-    echo json_encode(['success' => false, 'message' => 'Invalid email, password, or role.']);
-    exit;
+    json_response(['success' => false, 'message' => 'Invalid email or password.']);
 }
 
 if ($user['status'] === 'inactive') {
-    echo json_encode(['success' => false, 'message' => 'Your account is inactive. Please contact an administrator.']);
-    exit;
+    json_response(['success' => false, 'message' => 'Your account is inactive. Please contact an administrator.']);
 }
 
 // Prevent session fixation: issue a fresh session id at privilege change.
@@ -44,7 +38,9 @@ $_SESSION['user_id']   = (int) $user['user_id'];
 $_SESSION['user_name'] = $user['name'];
 $_SESSION['user_role'] = $user['role'];
 
-// Redirect based on role
+log_activity($conn, (int) $user['user_id'], $user['role'], 'login', null);
+
+// Redirect based on role.
 $redirect = '../frontend/user-dashboard.php';
 if ($user['role'] === 'dietitian') {
     $redirect = '../frontend/dietitian-dashboard.php';
@@ -52,4 +48,4 @@ if ($user['role'] === 'dietitian') {
     $redirect = '../frontend/admin-dashboard.php';
 }
 
-echo json_encode(['success' => true, 'redirect' => $redirect, 'role' => $user['role'], 'name' => $user['name']]);
+json_response(['success' => true, 'redirect' => $redirect, 'role' => $user['role'], 'name' => $user['name']]);

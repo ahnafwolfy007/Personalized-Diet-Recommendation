@@ -2,6 +2,99 @@
 
 All notable changes to DietSync are documented here.
 
+## [Feature upgrade] – 2026-06-14
+
+A large feature pass spanning authentication, profiles, meal logging, plans,
+analytics and admin tooling — still vanilla PHP/JS/CSS, no dependencies. New
+tables are additive; existing databases upgrade via `database/migration_v2.sql`.
+
+### Authentication & profiles
+
+- **Role removed from login.** Login now takes email + password only; the role is
+  derived from the account, never chosen by the client. `backend/login.php` was
+  rewritten on the shared `auth.php` helpers and looks the user up by email alone
+  (still a single generic "Invalid email or password" message).
+  *Files: `frontend/login.php`, `backend/login.php`.*
+- **Role-based registration.** Registration starts with a two-button role choice
+  (Patient = green, Dietitian = indigo, with hover/focus states), then reveals a
+  role-specific form — health metrics for patients, professional details
+  (`works_at`, experience, specialization, bio) for dietitians. Both roles save to
+  the same `users` table; role-irrelevant columns are stored `NULL`.
+  *Files: `frontend/register.php`, `backend/register.php`.*
+- **Public profiles + "View Profile".** Every patient and dietitian has a public,
+  role-aware profile (`frontend/profile-view.php`, `backend/get_public_profile.php`).
+  Patients can view a dietitian before requesting, dietitians can view a patient
+  before accepting, and admins can view anyone from User Management. Email is only
+  exposed to the admin or the user themselves. Dietitians gained an editable
+  **Profile** page (`frontend/dietitian-profile.php`).
+
+### Meal logging
+
+- **Household measurement units.** Log Food accepts Grams, Portion (150 g),
+  Glass (250 g), Table-spoon (15 g) and Tea-spoon (5 g). The unit→grams conversion
+  and the calorie math are done server-side (`serving_to_grams()` in
+  `helpers.php`); the client value is never trusted. `food_logs` gained
+  `serving_unit` / `serving_amount`.
+- **Smart food sorting.** For patients, `get_foods.php` returns the food list with
+  their most recently/frequently logged foods first (a single LEFT-JOIN over a
+  per-user usage summary — no N+1), reducing repetitive searching.
+- **User-contributed foods + admin verification.** Users can add a missing food
+  (name, category, calories/100g) via `backend/add_food.php`; it is stored
+  `is_verified = 0`, attributed to the author, and usable immediately but visibly
+  badged **Unverified**. A new admin **Foods** page
+  (`frontend/admin-foods.php` + `admin_get_foods/update_food/delete_food.php`)
+  lists every food (pending first) to verify, edit, or remove.
+
+### Diet plans
+
+- **Database-driven meal plans.** Dietitians now build plans by selecting foods and
+  amounts from the database instead of free text (`diet_plan_items` table). The
+  total calories for the three meals must be **≤ the patient's required calories**,
+  re-validated server-side; all writes are transactional. Legacy free-text plans
+  still render as a fallback.
+  *Files: `frontend/dietitian-create-plan.php`, `backend/dietitian_create_plan.php`,
+  `backend/dietitian_get_plan.php`, `backend/get_diet_plan.php`.*
+- **Interactive "Taken" checkmarks.** Patients tick a plan item as taken; this
+  auto-logs it to their meal log (and un-ticking removes it), idempotent per item
+  per day via `meal_completions` and a transaction.
+  *Files: `frontend/user-diet-plan.php`, `backend/log_plan_item.php`.*
+
+### Relationships, analytics & monitoring
+
+- **Unassignment with rationale.** A patient or dietitian can end an assignment but
+  must give a reason (`backend/unassign.php`, `assignment_removals` table). The
+  removed counterpart sees the reason as a banner
+  (`backend/get_removal_notice.php`), and it is recorded for the admin.
+- **Patient Analytics (dietitian).** New sidebar page showing each patient's
+  today vs need, 7-day average intake, plan adherence, today's water and last
+  activity — all from aggregated queries (no N+1).
+  *Files: `frontend/dietitian-analytics.php`, `backend/dietitian_get_analytics.php`.*
+- **Water intake (patient).** A dedicated water tracker (quick-add + custom,
+  daily goal, 7-day chart) whose totals surface in Patient Analytics.
+  *Files: `frontend/user-water.php`, `backend/log_water.php` / `get_water.php` /
+  `delete_water.php`.*
+- **Admin Analytics & Activity Monitor.** `frontend/admin-analytics.php` shows
+  app-wide stats and a 7-day signup chart; `frontend/admin-activity.php` shows a
+  paginated feed of meaningful actions (login, registration, requests, plan
+  create/update, feedback, food add/verify, unassignment). Individual food and
+  water log entries are deliberately **not** recorded, keeping the feed signal-rich.
+
+### Security / reliability
+
+- New mutating endpoints all require POST + CSRF, enforce role/ownership in the
+  `WHERE` clause, validate inputs against allow-lists, recompute all
+  money-numbers (calories, plan totals, grams) server-side, and wrap multi-row
+  writes in transactions with rollback + `error_log`.
+- `get_diet_plan.php` is now scoped to the patient's current dietitian (no stale
+  plan after reassignment).
+
+### Database
+
+- `database/migration_v2.sql` (new) adds the columns and tables above to an
+  existing install. `database/schema.sql` folds the same DDL in for fresh installs,
+  and `database/dummy_data.sql` seeds structured plan items, a few unverified
+  foods, and water history.
+
 ## [Usability & engagement] – 2026-06-13
 
 A follow-up pass focused on making the app friendlier, more accessible, and more

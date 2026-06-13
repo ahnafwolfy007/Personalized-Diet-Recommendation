@@ -118,7 +118,7 @@ include __DIR__ . '/partials/head.php';
           }
           return '<tr>' +
             '<td>' + escapeHtml(log.food_name) + '</td>' +
-            '<td class="text-gray">' + escapeHtml(log.quantity_g) + 'g</td>' +
+            '<td class="text-gray">' + escapeHtml(log.amount_label) + '</td>' +
             '<td class="text-right">' + escapeHtml(log.calories_consumed) + ' kcal</td>' +
             '<td class="text-gray">' + escapeHtml(log.time) + '</td>' +
             '<td class="text-right"><button class="row-action js-del" data-id="' + Number(log.log_id) + '" title="Remove entry" aria-label="Remove ' + escapeHtml(log.food_name) + '">' +

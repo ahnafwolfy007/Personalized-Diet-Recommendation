@@ -24,6 +24,11 @@ CREATE TABLE IF NOT EXISTS users (
     status                ENUM('active','inactive') NOT NULL DEFAULT 'active',
     created_at            DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     assigned_dietitian_id INT          DEFAULT NULL,
+    -- Dietitian-only professional details (NULL for patients/admins).
+    works_at              VARCHAR(150) DEFAULT NULL,
+    experience_years      INT          DEFAULT NULL,
+    specialization        VARCHAR(150) DEFAULT NULL,
+    bio                   TEXT         DEFAULT NULL,
     KEY idx_users_role (role),
     KEY idx_users_assigned_dietitian (assigned_dietitian_id),
     CONSTRAINT fk_users_assigned_dietitian
@@ -38,7 +43,14 @@ CREATE TABLE IF NOT EXISTS foods (
     name              VARCHAR(150) NOT NULL,
     calories_per_100g FLOAT        NOT NULL,
     category          VARCHAR(50)  NOT NULL DEFAULT 'General',
-    KEY idx_foods_category_name (category, name)
+    -- User contributions: created_by set when a user adds a food; is_verified=0
+    -- until an admin reviews it. Seeded reference foods are verified by default.
+    created_by        INT          DEFAULT NULL,
+    is_verified       TINYINT(1)   NOT NULL DEFAULT 1,
+    created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_foods_category_name (category, name),
+    KEY idx_foods_verified (is_verified),
+    CONSTRAINT fk_foods_created_by FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
@@ -51,6 +63,10 @@ CREATE TABLE IF NOT EXISTS food_logs (
     food_id           INT   NOT NULL,
     quantity_g        FLOAT NOT NULL,
     calories_consumed FLOAT NOT NULL,
+    -- Measurement metadata: the unit/amount the user picked (Portion, Glass, etc).
+    -- quantity_g remains the resolved grams that calories are computed from.
+    serving_unit      VARCHAR(20) NOT NULL DEFAULT 'g',
+    serving_amount    FLOAT       DEFAULT NULL,
     logged_at         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY idx_food_logs_user_logged (user_id, logged_at),
     KEY idx_food_logs_food (food_id),
@@ -109,13 +125,92 @@ CREATE TABLE IF NOT EXISTS dietitian_requests (
     CONSTRAINT fk_requests_dietitian FOREIGN KEY (dietitian_id) REFERENCES users(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ------------------------------------------------------------
+-- diet_plan_items : database-driven meal plan rows (food + amount)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS diet_plan_items (
+    item_id    INT AUTO_INCREMENT PRIMARY KEY,
+    plan_id    INT   NOT NULL,
+    meal       ENUM('breakfast','lunch','dinner') NOT NULL,
+    food_id    INT   NOT NULL,
+    quantity_g FLOAT NOT NULL,
+    calories   FLOAT NOT NULL,
+    KEY idx_plan_items_plan_meal (plan_id, meal),
+    KEY idx_plan_items_food (food_id),
+    CONSTRAINT fk_plan_items_plan FOREIGN KEY (plan_id) REFERENCES diet_plans(plan_id) ON DELETE CASCADE,
+    CONSTRAINT fk_plan_items_food FOREIGN KEY (food_id) REFERENCES foods(food_id)     ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- meal_completions : a patient's "Taken/Done" tick for a plan item on a day
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS meal_completions (
+    completion_id INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id    INT  NOT NULL,
+    item_id       INT  NOT NULL,
+    completed_on  DATE NOT NULL,
+    log_id        INT  NULL,
+    UNIQUE KEY uniq_completion_item_day (item_id, completed_on),
+    KEY idx_completions_patient_day (patient_id, completed_on),
+    CONSTRAINT fk_completions_patient FOREIGN KEY (patient_id) REFERENCES users(user_id)           ON DELETE CASCADE,
+    CONSTRAINT fk_completions_item    FOREIGN KEY (item_id)    REFERENCES diet_plan_items(item_id) ON DELETE CASCADE,
+    CONSTRAINT fk_completions_log     FOREIGN KEY (log_id)     REFERENCES food_logs(log_id)        ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- water_logs : daily water intake entries
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS water_logs (
+    water_id  INT AUTO_INCREMENT PRIMARY KEY,
+    user_id   INT NOT NULL,
+    amount_ml INT NOT NULL,
+    logged_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_water_user_logged (user_id, logged_at),
+    CONSTRAINT fk_water_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- assignment_removals : rationale recorded when a patient/dietitian unassigns
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS assignment_removals (
+    removal_id      INT AUTO_INCREMENT PRIMARY KEY,
+    patient_id      INT  NOT NULL,
+    dietitian_id    INT  NOT NULL,
+    removed_by      INT  NOT NULL,
+    removed_by_role ENUM('patient','dietitian') NOT NULL,
+    reason          TEXT NOT NULL,
+    acknowledged    TINYINT(1) NOT NULL DEFAULT 0,
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_removals_patient (patient_id),
+    KEY idx_removals_dietitian (dietitian_id),
+    CONSTRAINT fk_removals_patient   FOREIGN KEY (patient_id)   REFERENCES users(user_id) ON DELETE CASCADE,
+    CONSTRAINT fk_removals_dietitian FOREIGN KEY (dietitian_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- activity_log : admin Activity Monitor feed.
+-- Records meaningful actions (login, requests, plans, feedback, food add/verify,
+-- unassign). Individual food/water log entries are intentionally NOT recorded.
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS activity_log (
+    activity_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id     INT          NULL,
+    actor_role  VARCHAR(20)  NOT NULL DEFAULT '',
+    action      VARCHAR(60)  NOT NULL,
+    detail      VARCHAR(255) NULL,
+    created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_activity_created (created_at),
+    KEY idx_activity_user (user_id),
+    CONSTRAINT fk_activity_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ============================================================
 -- SEED: default accounts (all default passwords = "password")
 -- ============================================================
-INSERT INTO users (name, email, password, role, status) VALUES
-('Admin',             'admin@dietsync.com',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin',     'active'),
-('Dr. Sarah Johnson', 'sarah@dietsync.com',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'dietitian', 'active'),
-('Dr. Michael Chen',  'michael@dietsync.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'dietitian', 'active');
+INSERT INTO users (name, email, password, role, status, works_at, experience_years, specialization, bio) VALUES
+('Admin',             'admin@dietsync.com',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin',     'active', NULL, NULL, NULL, NULL),
+('Dr. Sarah Johnson', 'sarah@dietsync.com',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'dietitian', 'active', 'City Health Clinic', 8,  'Weight management & sports nutrition', 'Registered dietitian focused on sustainable, evidence-based eating habits.'),
+('Dr. Michael Chen',  'michael@dietsync.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'dietitian', 'active', 'Wellness Partners',  12, 'Clinical & diabetic nutrition',        'Clinical dietitian helping patients manage chronic conditions through diet.');
 
 INSERT INTO users (name, email, password, role, status, age, gender, height_cm, weight_kg, activity_level) VALUES
 ('John Doe', 'john@dietsync.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'patient', 'active', 28, 'Male', 175, 70, 'Moderately Active (3-5 days/week)');

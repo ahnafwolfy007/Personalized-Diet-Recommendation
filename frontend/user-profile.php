@@ -93,6 +93,10 @@ include __DIR__ . '/partials/head.php';
               <p class="ab-label">Assigned Dietitian</p>
               <p class="ab-name" id="v-dietitian-name">—</p>
             </div>
+            <div style="margin-left:auto; display:flex; gap:0.5rem;">
+              <a id="view-dietitian-btn" class="btn btn-secondary btn-sm" href="#">View</a>
+              <button id="unassign-btn" class="btn btn-secondary btn-sm">Unassign</button>
+            </div>
           </div>
 
           <!-- STATE 2: Request is pending (yellow banner) -->
@@ -248,13 +252,15 @@ include __DIR__ . '/partials/head.php';
 
         if (p.assigned_dietitian_id) {
           document.getElementById('v-dietitian-name').textContent = p.dietitian_name;
+          document.getElementById('view-dietitian-btn').href =
+            'profile-view.php?id=' + encodeURIComponent(p.assigned_dietitian_id);
           showState('assigned');
         } else {
           checkPendingRequest();
         }
       })
       .catch(function() {
-        alert('Could not connect to the server. Please try again later.');
+        showToast('Could not connect to the server. Please try again later.', 'error');
       });
   }
 
@@ -333,7 +339,10 @@ include __DIR__ . '/partials/head.php';
               '<div class="di-name">' + escapeHtml(d.name) + '</div>' +
               '<div class="di-role">Dietitian</div>' +
             '</div>' +
-            '<button class="btn-request" onclick="sendRequest(' + Number(d.user_id) + ', this)">Send Request</button>' +
+            '<div class="flex items-center gap-2">' +
+              '<a class="btn btn-secondary btn-sm" href="profile-view.php?id=' + Number(d.user_id) + '">View</a>' +
+              '<button class="btn-request" onclick="sendRequest(' + Number(d.user_id) + ', this)">Send Request</button>' +
+            '</div>' +
           '</div>';
         }).join('');
       })
@@ -435,7 +444,28 @@ include __DIR__ . '/partials/head.php';
     });
   });
 
+  // ── UNASSIGN dietitian (with required reason) ─────────
+  document.getElementById('unassign-btn').addEventListener('click', function () {
+    showReasonModal({
+      title: 'End assignment with your dietitian',
+      label: 'Tell your dietitian why you are ending the assignment. This reason will be visible to them and the admin.',
+      confirmText: 'End assignment',
+      onConfirm: function (reason, done) {
+        var fd = new FormData();
+        fd.append('reason', reason);
+        fetch('../backend/unassign.php', { method: 'POST', body: fd })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            showToast(data.message, data.success ? 'success' : 'error');
+            if (data.success) { done(); loadProfile(); }
+          })
+          .catch(function () { showToast('Network error. Please try again.', 'error'); });
+      }
+    });
+  });
+
   loadProfile();
+  initRemovalNotice();
 </script>
 </body>
 </html>

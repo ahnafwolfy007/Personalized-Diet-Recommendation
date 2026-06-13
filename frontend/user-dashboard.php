@@ -179,6 +179,8 @@ include __DIR__ . '/partials/head.php';
       document.getElementById('food-log-table').innerHTML =
         '<tr><td colspan="4" class="text-center text-gray">Could not load data. Please try again later.</td></tr>';
     });
+
+  initRemovalNotice();
 </script>
 </body>
 </html>

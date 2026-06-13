@@ -3,6 +3,7 @@
 // Patient sends a request to a specific dietitian
 
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/helpers.php';
 
 $patient_id = require_role('patient');
 require_post();
@@ -49,6 +50,7 @@ $ok = $stmt->execute();
 $stmt->close();
 
 if ($ok) {
+    log_activity($conn, $patient_id, 'patient', 'send_request', 'Requested dietitian #' . $dietitian_id);
     json_response(['success' => true, 'message' => 'Request sent! Please wait for the dietitian to accept.']);
 } else {
     json_response(['success' => false, 'message' => 'Failed to send request. Please try again.'], 500);

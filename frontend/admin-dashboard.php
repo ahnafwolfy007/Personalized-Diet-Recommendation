@@ -55,9 +55,30 @@ include __DIR__ . '/partials/head.php';
           <div class="activity-item">
             <div>
               <p class="font-medium">Manage Users</p>
-              <p class="text-sm text-gray">View and remove system users</p>
+              <p class="text-sm text-gray">View, inspect and remove system users</p>
             </div>
             <a href="admin-users.php" class="btn btn-primary btn-sm">Go to Users</a>
+          </div>
+          <div class="activity-item">
+            <div>
+              <p class="font-medium">Review Foods</p>
+              <p class="text-sm text-gray">Verify or edit user-contributed foods <span id="qa-pending" class="badge badge-yellow hidden"></span></p>
+            </div>
+            <a href="admin-foods.php" class="btn btn-primary btn-sm">Go to Foods</a>
+          </div>
+          <div class="activity-item">
+            <div>
+              <p class="font-medium">Analytics</p>
+              <p class="text-sm text-gray">App-wide statistics and trends</p>
+            </div>
+            <a href="admin-analytics.php" class="btn btn-primary btn-sm">View Analytics</a>
+          </div>
+          <div class="activity-item">
+            <div>
+              <p class="font-medium">Activity Monitor</p>
+              <p class="text-sm text-gray">Track patient and dietitian actions</p>
+            </div>
+            <a href="admin-activity.php" class="btn btn-primary btn-sm">Open Monitor</a>
           </div>
         </div>
       </div>
@@ -75,6 +96,12 @@ include __DIR__ . '/partials/head.php';
       document.getElementById('stat-patients').textContent   = data.total_patients;
       document.getElementById('stat-dietitians').textContent = data.total_dietitians;
       document.getElementById('stat-plans').textContent      = data.active_plans;
+
+      if (data.pending_foods > 0) {
+        var pill = document.getElementById('qa-pending');
+        pill.textContent = data.pending_foods + ' pending';
+        pill.classList.remove('hidden');
+      }
     });
 </script>
 </body>

@@ -68,6 +68,71 @@
     }, 3500);
   };
 
+  // Reusable "give a reason" modal. Resolves through onConfirm(reason, done),
+  // where calling done() closes the modal. Used for unassignment rationale.
+  window.showReasonModal = function (opts) {
+    opts = opts || {};
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay open';
+    overlay.style.zIndex = '1200';
+    overlay.innerHTML =
+      '<div class="modal-content" style="max-width:480px;">' +
+        '<div class="modal-header"><h3>' + (opts.title || 'Provide a reason') + '</h3>' +
+          '<button type="button" class="modal-close" data-close>&times;</button></div>' +
+        '<div class="modal-body">' +
+          '<p class="text-sm text-gray mb-4">' + (opts.label || 'A reason is required and will be shared with the other person.') + '</p>' +
+          '<textarea id="reason-modal-text" rows="4" placeholder="' + (opts.placeholder || 'Type your reason…') + '"></textarea>' +
+          '<div class="flex gap-3 mt-4">' +
+            '<button type="button" class="btn btn-primary" data-confirm>' + (opts.confirmText || 'Submit') + '</button>' +
+            '<button type="button" class="btn btn-secondary" data-close>Cancel</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(overlay);
+
+    var textarea = overlay.querySelector('#reason-modal-text');
+    textarea.focus();
+
+    function close() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay || e.target.hasAttribute('data-close')) close();
+    });
+    overlay.querySelector('[data-confirm]').addEventListener('click', function () {
+      var reason = textarea.value.trim();
+      if (!reason) { textarea.focus(); return; }
+      if (typeof opts.onConfirm === 'function') opts.onConfirm(reason, close);
+    });
+  };
+
+  // Renders a dismissible banner at the top of .main-content if the current user
+  // was unassigned by their counterpart (shows the recorded reason).
+  window.initRemovalNotice = function () {
+    fetch('../backend/get_removal_notice.php')
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.success || !data.notice) return;
+        var n = data.notice;
+        var who = n.initiator_role === 'patient' ? 'patient' : 'dietitian';
+        var host = document.querySelector('.main-content .max-w-1200, .main-content .container-narrow, .main-content > div');
+        if (!host) return;
+        var banner = document.createElement('div');
+        banner.className = 'removal-notice';
+        banner.innerHTML =
+          '<div><strong>Assignment ended.</strong> Your ' + who + ' ' +
+          window.escapeHtml(n.initiator_name) + ' ended the assignment on ' + window.escapeHtml(n.created_at) +
+          '.<div class="removal-reason">Reason: ' + window.escapeHtml(n.reason) + '</div></div>' +
+          '<button type="button" class="btn btn-secondary btn-sm" data-dismiss>Dismiss</button>';
+        host.insertBefore(banner, host.firstChild);
+        banner.querySelector('[data-dismiss]').addEventListener('click', function () {
+          var fd = new FormData();
+          fd.append('removal_id', n.removal_id);
+          fetch('../backend/get_removal_notice.php', { method: 'POST', body: fd });
+          banner.parentNode.removeChild(banner);
+        });
+      })
+      .catch(function () {});
+  };
+
   // Show/hide password toggle: any button.pw-toggle with data-target="<input id>".
   document.addEventListener('click', function (e) {
     var btn = e.target.closest ? e.target.closest('.pw-toggle') : null;

@@ -3,6 +3,7 @@
 // Patient sends a feedback message to their assigned dietitian.
 
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/helpers.php';
 
 $patient_id = require_role('patient');
 require_post();
@@ -35,6 +36,7 @@ $ok = $stmt->execute();
 $stmt->close();
 
 if ($ok) {
+    log_activity($conn, $patient_id, 'patient', 'send_feedback', 'Sent feedback to dietitian #' . $dietitian_id);
     json_response(['success' => true, 'message' => 'Feedback sent to your dietitian.']);
 } else {
     json_response(['success' => false, 'message' => 'Failed to send feedback. Please try again.'], 500);

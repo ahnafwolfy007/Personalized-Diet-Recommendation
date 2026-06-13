@@ -58,6 +58,57 @@ if (!function_exists('daily_calorie_need')) {
     }
 }
 
+if (!function_exists('serving_units')) {
+    /**
+     * Standard household-measurement units mapped to their gram value.
+     * Used to convert a user-friendly amount into grams server-side so calorie
+     * math is never trusted to the client. Values are sensible standards.
+     */
+    function serving_units(): array
+    {
+        return [
+            'g'       => 1,    // grams (pass-through)
+            'portion' => 150,  // a standard portion/serving
+            'glass'   => 250,  // a glass (≈250 ml)
+            'tbsp'    => 15,   // table-spoon
+            'tsp'     => 5,    // tea-spoon
+        ];
+    }
+}
+
+if (!function_exists('serving_to_grams')) {
+    /**
+     * Convert an amount in the given unit to grams using serving_units().
+     * Unknown units fall back to grams. Returns a float >= 0.
+     */
+    function serving_to_grams(string $unit, float $amount): float
+    {
+        $units = serving_units();
+        $factor = $units[$unit] ?? 1;
+        return max(0.0, $amount * $factor);
+    }
+}
+
+if (!function_exists('log_activity')) {
+    /**
+     * Record a meaningful action in activity_log for the admin Activity Monitor.
+     * Deliberately NOT used for individual food/water log entries (too noisy).
+     * Failures are swallowed (logged) so they never break the primary action.
+     */
+    function log_activity(mysqli $conn, ?int $userId, string $role, string $action, ?string $detail = null): void
+    {
+        try {
+            $stmt = $conn->prepare("INSERT INTO activity_log (user_id, actor_role, action, detail) VALUES (?, ?, ?, ?)");
+            if (!$stmt) { return; }
+            $stmt->bind_param('isss', $userId, $role, $action, $detail);
+            $stmt->execute();
+            $stmt->close();
+        } catch (Throwable $e) {
+            error_log('log_activity failed: ' . $e->getMessage());
+        }
+    }
+}
+
 if (!function_exists('day_bounds')) {
     /**
      * Return [start, endExclusive] datetime strings for a Y-m-d date, for use in

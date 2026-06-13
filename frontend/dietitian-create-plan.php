@@ -11,201 +11,296 @@ include __DIR__ . '/partials/head.php';
 
   <?php include __DIR__ . '/partials/sidebar.php'; ?>
 
-  <!-- Main Content -->
   <main class="main-content">
     <div class="max-w-1200">
       <h1 class="text-3xl mb-2">Create / Edit Meal Plan</h1>
       <p class="text-gray mb-8" style="font-size:0.95rem;">
-        You can only create meal plans for patients who are assigned to you.
-        Patients must send you a request from their Profile page first.
+        Build the plan from foods in the database. The total for the three meals
+        must stay within the patient's daily calorie requirement.
       </p>
 
-      <!-- Status message box -->
-      <div id="plan-msg" class="hidden mb-4 p-3 rounded text-sm"></div>
-
-      <!-- ── NO PATIENTS banner (shown when no assigned patients) ── -->
+      <!-- No patients banner -->
       <div id="no-patients-banner" class="hidden card p-8 text-center">
         <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 1rem;display:block"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
         <h2 class="text-xl mb-2" style="color:#555;">No Patients Assigned Yet</h2>
-        <p class="text-gray mb-6">
-          You don't have any assigned patients yet.<br>
-          When a patient sends you a request, go to your
-          <a href="dietitian-dashboard.php" style="color:#22c55e; font-weight:600;">Dashboard</a>
-          and <strong>Accept</strong> their request. They will then appear here.
-        </p>
-        <a href="dietitian-dashboard.php" class="btn btn-primary px-6 py-3">Go to Dashboard → Accept Requests</a>
+        <p class="text-gray mb-6">When a patient sends a request, accept it on your
+          <a href="dietitian-dashboard.php" style="color:#22c55e;font-weight:600;">Dashboard</a> and they will appear here.</p>
+        <a href="dietitian-dashboard.php" class="btn btn-primary px-6 py-3">Go to Dashboard</a>
       </div>
 
-      <!-- ── PLAN FORM (shown when patients are available) ── -->
-      <div id="plan-form-wrapper" class="hidden card p-6">
-        <form id="plan-form">
-
-          <!-- Step 1: Select a patient -->
-          <div class="form-group">
-            <label for="patient-select">
-              1. Select a Patient
-              <span style="font-weight:400; color:#666; font-size:0.85rem;">(only your assigned patients are shown)</span>
-            </label>
+      <div id="plan-form-wrapper" class="hidden">
+        <!-- Step 1: patient -->
+        <div class="card p-6 mb-6">
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="patient-select">1. Select a patient</label>
             <div class="select-wrapper">
-              <select id="patient-select" name="patient_id" onchange="loadExistingPlan(this.value)">
+              <select id="patient-select">
                 <option value="">-- Select a patient --</option>
               </select>
-              <span class="select-arrow">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-              </span>
+              <span class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+            </div>
+          </div>
+        </div>
+
+        <div id="builder" class="hidden">
+          <!-- Calorie cap meter -->
+          <div class="card p-6 mb-6">
+            <div class="flex justify-between items-baseline mb-2">
+              <h2 class="text-xl">Plan total</h2>
+              <span id="cap-summary" class="text-gray text-sm">—</span>
+            </div>
+            <div class="calorie-bar-track"><div class="calorie-bar-fill" id="cap-bar"></div></div>
+            <p class="text-sm mt-2" id="cap-status"></p>
+          </div>
+
+          <!-- Step 2: add foods -->
+          <div class="card p-6 mb-6">
+            <label class="mb-2" style="display:block;">2. Add foods to the plan</label>
+            <div class="plan-add-row">
+              <div class="select-wrapper" style="min-width:140px;">
+                <select id="meal-select">
+                  <option value="breakfast">Breakfast</option>
+                  <option value="lunch">Lunch</option>
+                  <option value="dinner">Dinner</option>
+                </select>
+                <span class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </div>
+              <div class="combo" id="food-combo" style="flex:1; min-width:200px;">
+                <input type="text" id="food-search" class="combo-input" placeholder="Search foods…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="food-options" aria-autocomplete="list">
+                <ul class="combo-list hidden" id="food-options" role="listbox" aria-label="Food results"></ul>
+              </div>
+              <input type="number" id="amount-input" placeholder="grams" min="1" step="1" value="100" style="width:110px;">
+              <button type="button" id="add-item-btn" class="btn btn-primary">Add</button>
+            </div>
+            <p class="text-xs text-gray mt-2" id="item-preview"></p>
+          </div>
+
+          <!-- Items table -->
+          <div class="bg-white border rounded-lg mb-6">
+            <div class="overflow-x-auto">
+              <table>
+                <thead>
+                  <tr><th>Meal</th><th>Food</th><th class="text-right">Amount</th><th class="text-right">Calories</th><th class="text-right">Remove</th></tr>
+                </thead>
+                <tbody id="items-table">
+                  <tr><td colspan="5" class="text-center text-gray">No foods added yet.</td></tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
-          <!-- Existing plan notice (filled by JS when a plan already exists) -->
-          <div id="existing-plan-notice" class="hidden mb-4 p-3 rounded text-sm"
-               style="background:#f0fdf4; color:#166534; border:1px solid #86efac;">
-            This patient already has a plan from you. The fields are pre-filled — make your changes and click Save.
-          </div>
-
-          <!-- Step 2: Breakfast -->
-          <div class="form-group">
-            <label for="breakfast">2. Breakfast Plan</label>
-            <textarea id="breakfast" name="breakfast" rows="4"
-              placeholder="e.g. Oatmeal with fruits, 1 boiled egg, green tea…"></textarea>
-          </div>
-
-          <!-- Lunch -->
-          <div class="form-group">
-            <label for="lunch">3. Lunch Plan</label>
-            <textarea id="lunch" name="lunch" rows="4"
-              placeholder="e.g. Grilled chicken breast (150g), brown rice (1 cup), salad…"></textarea>
-          </div>
-
-          <!-- Dinner -->
-          <div class="form-group">
-            <label for="dinner">4. Dinner Plan</label>
-            <textarea id="dinner" name="dinner" rows="4"
-              placeholder="e.g. Steamed fish, vegetables, small portion of rice…"></textarea>
-          </div>
-
-          <!-- Notes -->
-          <div class="form-group">
-            <label for="notes">5. Additional Notes / Instructions</label>
-            <textarea id="notes" name="notes" rows="5"
-              placeholder="e.g. Avoid fried food. Drink 2L water daily. Target: 1800 kcal/day…"></textarea>
-          </div>
-
-          <!-- Submit button -->
-          <div class="form-actions">
-            <button type="submit" id="save-btn" class="btn btn-primary flex items-center gap-2">
+          <!-- Notes + save -->
+          <div class="card p-6">
+            <div class="form-group">
+              <label for="notes">3. Notes / instructions</label>
+              <textarea id="notes" rows="4" placeholder="e.g. Drink 2L water daily. Avoid fried food. Eat every 3-4 hours…"></textarea>
+            </div>
+            <button type="button" id="save-btn" class="btn btn-primary flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
               Save Plan
             </button>
           </div>
-
-        </form>
+        </div>
       </div>
 
     </div>
   </main>
-
 </div>
 
 <script>
-  // ── 1. LOAD ASSIGNED PATIENTS into the dropdown ──────
-  fetch('../backend/dietitian_get_all_patients.php')
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      if (!data.success) {
-        window.location.href = 'login.php';
-        return;
-      }
+  var allFoods = [], filtered = [], activeIndex = -1, selectedFood = null;
+  var planItems = [];      // {meal, food_id, food_name, quantity_g, calories}
+  var dailyNeed = 0;
 
+  var searchInput = document.getElementById('food-search');
+  var optionsList = document.getElementById('food-options');
+  var amountInput = document.getElementById('amount-input');
+
+  // ── Load assigned patients ──
+  fetch('../backend/dietitian_get_all_patients.php')
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (!data.success) { window.location.href = 'login.php'; return; }
       if (data.patients.length === 0) {
         document.getElementById('no-patients-banner').classList.remove('hidden');
-        document.getElementById('plan-form-wrapper').classList.add('hidden');
         return;
       }
-
-      document.getElementById('no-patients-banner').classList.add('hidden');
       document.getElementById('plan-form-wrapper').classList.remove('hidden');
-
-      var select = document.getElementById('patient-select');
-      var html = '<option value="">-- Select a patient --</option>';
-      for (var i = 0; i < data.patients.length; i++) {
-        var p = data.patients[i];
-        html += '<option value="' + Number(p.user_id) + '">' + escapeHtml(p.name) + ' (' + escapeHtml(p.email) + ')</option>';
-      }
-      select.innerHTML = html;
+      var sel = document.getElementById('patient-select');
+      sel.innerHTML = '<option value="">-- Select a patient --</option>' +
+        data.patients.map(function (p) {
+          return '<option value="' + Number(p.user_id) + '">' + escapeHtml(p.name) + ' (' + escapeHtml(p.email) + ')</option>';
+        }).join('');
     })
-    .catch(function() {
-      document.getElementById('plan-msg').textContent = 'Could not load patients. Please try again later.';
-      document.getElementById('plan-msg').classList.remove('hidden');
-    });
+    .catch(function () { showToast('Could not load patients.', 'error'); });
 
-  // ── 2. LOAD EXISTING PLAN when a patient is selected ─
-  function loadExistingPlan(patientId) {
-    document.getElementById('breakfast').value = '';
-    document.getElementById('lunch').value     = '';
-    document.getElementById('dinner').value    = '';
-    document.getElementById('notes').value     = '';
-    document.getElementById('existing-plan-notice').classList.add('hidden');
+  // ── Load all foods once ──
+  fetch('../backend/get_foods.php')
+    .then(function (r) { return r.json(); })
+    .then(function (data) { if (data.success) allFoods = data.foods; });
 
-    if (!patientId) return;
+  // ── Patient change → load context ──
+  document.getElementById('patient-select').addEventListener('change', function () {
+    var pid = this.value;
+    planItems = [];
+    document.getElementById('notes').value = '';
+    if (!pid) { document.getElementById('builder').classList.add('hidden'); return; }
 
-    fetch('../backend/get_diet_plan.php?patient_id=' + encodeURIComponent(patientId))
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (data.success && data.plan) {
-          document.getElementById('breakfast').value = data.plan.breakfast_text || '';
-          document.getElementById('lunch').value     = data.plan.lunch_text     || '';
-          document.getElementById('dinner').value    = data.plan.dinner_text    || '';
-          document.getElementById('notes').value     = data.plan.notes          || '';
-          document.getElementById('existing-plan-notice').classList.remove('hidden');
-        }
-      });
+    fetch('../backend/dietitian_get_plan.php?patient_id=' + encodeURIComponent(pid))
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!data.success) { showToast(data.message || 'Could not load plan.', 'error'); return; }
+        dailyNeed = Number(data.daily_need) || 0;
+        document.getElementById('notes').value = data.notes || '';
+        planItems = (data.items || []).map(function (it) {
+          return { meal: it.meal, food_id: Number(it.food_id), food_name: it.food_name,
+                   quantity_g: Number(it.quantity_g), calories: Number(it.calories) };
+        });
+        document.getElementById('builder').classList.remove('hidden');
+        renderItems();
+      })
+      .catch(function () { showToast('Could not load plan.', 'error'); });
+  });
+
+  // ── Combobox ──
+  function renderOptions(list) {
+    optionsList.innerHTML = list.length === 0
+      ? '<li class="combo-empty">No matching foods</li>'
+      : list.map(function (f, i) {
+          var badge = Number(f.is_verified) === 0 ? ' <span class="badge badge-yellow" style="font-size:0.6rem;">Unverified</span>' : '';
+          return '<li class="combo-option' + (i === activeIndex ? ' active' : '') + '" role="option" data-i="' + i + '">' +
+            '<span>' + escapeHtml(f.name) + badge + '</span>' +
+            '<span class="combo-cat">' + escapeHtml(f.calories_per_100g) + ' kcal/100g</span></li>';
+        }).join('');
+    optionsList.classList.remove('hidden');
+    searchInput.setAttribute('aria-expanded', 'true');
+  }
+  function openSearch(q) {
+    q = (q || '').trim().toLowerCase();
+    filtered = (q === '' ? allFoods.slice(0, 50)
+      : allFoods.filter(function (f) { return f.name.toLowerCase().indexOf(q) !== -1 || f.category.toLowerCase().indexOf(q) !== -1; }).slice(0, 50));
+    activeIndex = -1;
+    renderOptions(filtered);
+  }
+  function closeSearch() { optionsList.classList.add('hidden'); searchInput.setAttribute('aria-expanded', 'false'); activeIndex = -1; }
+  function chooseFood(f) { selectedFood = f; searchInput.value = f.name; closeSearch(); updatePreview(); }
+
+  searchInput.addEventListener('input', function () { selectedFood = null; openSearch(this.value); updatePreview(); });
+  searchInput.addEventListener('focus', function () { openSearch(this.value); });
+  searchInput.addEventListener('keydown', function (e) {
+    if (optionsList.classList.contains('hidden')) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); activeIndex = Math.min(activeIndex + 1, filtered.length - 1); renderOptions(filtered); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); activeIndex = Math.max(activeIndex - 1, 0); renderOptions(filtered); }
+    else if (e.key === 'Enter') { if (activeIndex >= 0 && filtered[activeIndex]) { e.preventDefault(); chooseFood(filtered[activeIndex]); } }
+    else if (e.key === 'Escape') { closeSearch(); }
+  });
+  optionsList.addEventListener('mousedown', function (e) {
+    var li = e.target.closest('.combo-option'); if (!li) return; e.preventDefault();
+    var idx = parseInt(li.getAttribute('data-i'), 10); if (filtered[idx]) chooseFood(filtered[idx]);
+  });
+  document.addEventListener('click', function (e) { if (!document.getElementById('food-combo').contains(e.target)) closeSearch(); });
+  amountInput.addEventListener('input', updatePreview);
+
+  function updatePreview() {
+    var grams = parseFloat(amountInput.value) || 0;
+    var prev = document.getElementById('item-preview');
+    if (selectedFood && grams > 0) {
+      var cal = (selectedFood.calories_per_100g / 100) * grams;
+      prev.textContent = selectedFood.name + ': ' + grams + 'g ≈ ' + Math.round(cal) + ' kcal';
+    } else { prev.textContent = ''; }
   }
 
-  // ── 3. SUBMIT the form to save/update the plan ───────
-  document.getElementById('plan-form').addEventListener('submit', function(e) {
-    e.preventDefault();
+  // ── Add item ──
+  document.getElementById('add-item-btn').addEventListener('click', function () {
+    var grams = parseFloat(amountInput.value);
+    if (!selectedFood) { showToast('Search and select a food first.', 'error'); return; }
+    if (!grams || grams <= 0) { showToast('Enter a valid amount in grams.', 'error'); return; }
+    var cal = Math.round((selectedFood.calories_per_100g / 100) * grams * 10) / 10;
+    planItems.push({ meal: document.getElementById('meal-select').value, food_id: Number(selectedFood.food_id),
+      food_name: selectedFood.name, quantity_g: grams, calories: cal });
+    selectedFood = null; searchInput.value = ''; document.getElementById('item-preview').textContent = '';
+    renderItems();
+  });
 
-    var btn    = document.getElementById('save-btn');
-    var msgDiv = document.getElementById('plan-msg');
-
-    var patientId = document.getElementById('patient-select').value;
-    if (!patientId) {
-      msgDiv.textContent      = 'Please select a patient first.';
-      msgDiv.style.background = '#fee2e2';
-      msgDiv.style.color      = '#991b1b';
-      msgDiv.style.border     = '1px solid #fca5a5';
-      msgDiv.classList.remove('hidden');
-      return;
+  // ── Items table + cap meter ──
+  var MEAL_LABELS = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' };
+  function renderItems() {
+    var tbody = document.getElementById('items-table');
+    if (planItems.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray">No foods added yet.</td></tr>';
+    } else {
+      var order = { breakfast: 0, lunch: 1, dinner: 2 };
+      var sorted = planItems.map(function (it, i) { return { it: it, i: i }; })
+        .sort(function (a, b) { return order[a.it.meal] - order[b.it.meal]; });
+      tbody.innerHTML = sorted.map(function (x) {
+        return '<tr>' +
+          '<td><span class="badge badge-gray">' + MEAL_LABELS[x.it.meal] + '</span></td>' +
+          '<td>' + escapeHtml(x.it.food_name) + '</td>' +
+          '<td class="text-right text-gray">' + Math.round(x.it.quantity_g) + 'g</td>' +
+          '<td class="text-right">' + Math.round(x.it.calories) + ' kcal</td>' +
+          '<td class="text-right"><button class="row-action js-remove" data-i="' + x.i + '" aria-label="Remove ' + escapeHtml(x.it.food_name) + '">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>' +
+          '</button></td></tr>';
+      }).join('');
     }
+    updateCap();
+  }
 
-    btn.textContent = 'Saving…';
-    btn.disabled    = true;
+  document.getElementById('items-table').addEventListener('click', function (e) {
+    var btn = e.target.closest('.js-remove'); if (!btn) return;
+    planItems.splice(parseInt(btn.getAttribute('data-i'), 10), 1);
+    renderItems();
+  });
 
-    fetch('../backend/dietitian_create_plan.php', { method: 'POST', body: new FormData(this) })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      msgDiv.textContent      = data.message;
-      msgDiv.style.background = data.success ? '#dcfce7' : '#fee2e2';
-      msgDiv.style.color      = data.success ? '#166534' : '#991b1b';
-      msgDiv.style.border     = data.success ? '1px solid #86efac' : '1px solid #fca5a5';
-      msgDiv.classList.remove('hidden');
+  function updateCap() {
+    var total = planItems.reduce(function (s, it) { return s + Number(it.calories); }, 0);
+    var bar = document.getElementById('cap-bar');
+    var summary = document.getElementById('cap-summary');
+    var status = document.getElementById('cap-status');
+    var over = dailyNeed > 0 && total > dailyNeed;
 
-      btn.textContent = 'Save Plan';
-      btn.disabled    = false;
+    if (dailyNeed > 0) {
+      var pct = Math.round((total / dailyNeed) * 100);
+      bar.style.width = Math.min(pct, 100) + '%';
+      bar.classList.toggle('over', over);
+      summary.textContent = Math.round(total) + ' / ' + dailyNeed + ' kcal (' + pct + '%)';
+      status.textContent = over
+        ? 'Over the patient\'s requirement by ' + Math.round(total - dailyNeed) + ' kcal — reduce amounts before saving.'
+        : (dailyNeed - total) + ' kcal of headroom remaining.';
+      status.className = 'text-sm mt-2 ' + (over ? 'text-red' : 'text-gray');
+    } else {
+      bar.style.width = '0%';
+      summary.textContent = Math.round(total) + ' kcal';
+      status.textContent = 'This patient has no calculated calorie requirement (incomplete profile), so no cap is enforced.';
+      status.className = 'text-sm mt-2 text-gray';
+    }
+    document.getElementById('save-btn').disabled = over;
+  }
 
-      if (data.success) {
-        document.getElementById('existing-plan-notice').classList.remove('hidden');
-        window.scrollTo(0, 0);
-      }
-    })
-    .catch(function() {
-      msgDiv.textContent      = 'Error saving plan. Please try again later.';
-      msgDiv.style.background = '#fee2e2';
-      msgDiv.style.color      = '#991b1b';
-      msgDiv.classList.remove('hidden');
-      btn.textContent = 'Save Plan';
-      btn.disabled    = false;
-    });
+  // ── Save ──
+  document.getElementById('save-btn').addEventListener('click', function () {
+    var pid = document.getElementById('patient-select').value;
+    if (!pid) { showToast('Select a patient first.', 'error'); return; }
+    if (planItems.length === 0) { showToast('Add at least one food.', 'error'); return; }
+    var total = planItems.reduce(function (s, it) { return s + Number(it.calories); }, 0);
+    if (dailyNeed > 0 && total > dailyNeed) { showToast('Total exceeds the patient\'s requirement.', 'error'); return; }
+
+    var btn = this; btn.disabled = true; btn.textContent = 'Saving…';
+    var fd = new FormData();
+    fd.append('patient_id', pid);
+    fd.append('notes', document.getElementById('notes').value);
+    fd.append('items', JSON.stringify(planItems.map(function (it) {
+      return { meal: it.meal, food_id: it.food_id, quantity_g: it.quantity_g };
+    })));
+
+    fetch('../backend/dietitian_create_plan.php', { method: 'POST', body: fd })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        btn.disabled = false; btn.textContent = 'Save Plan';
+        showToast(data.message, data.success ? 'success' : 'error');
+        if (data.success) window.scrollTo(0, 0);
+      })
+      .catch(function () { btn.disabled = false; btn.textContent = 'Save Plan'; showToast('Error saving plan.', 'error'); });
   });
 </script>
 </body>

@@ -53,23 +53,6 @@ if (!empty($_SESSION['user_id'])) {
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="login-as">Login As</label>
-          <div class="select-wrapper">
-            <select id="login-as" name="role">
-              <option value="patient">Patient</option>
-              <option value="dietitian">Dietitian</option>
-              <option value="admin">Admin</option>
-            </select>
-            <span class="select-arrow">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
-            </span>
-          </div>
-        </div>
-
         <button type="submit" id="login-btn" class="btn btn-primary btn-w-full py-3">Login</button>
       </form>
 

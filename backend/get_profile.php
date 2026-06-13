@@ -7,9 +7,11 @@ require_once __DIR__ . '/helpers.php';
 
 $user_id = require_login();
 
-// Get the user's profile, including their assigned dietitian's name
+// Get the user's profile, including their assigned dietitian's name and
+// dietitian-only professional fields (NULL for patients).
 $stmt = $conn->prepare("
-    SELECT u.name, u.email, u.age, u.gender, u.height_cm, u.weight_kg, u.activity_level,
+    SELECT u.name, u.email, u.role, u.age, u.gender, u.height_cm, u.weight_kg, u.activity_level,
+           u.works_at, u.experience_years, u.specialization, u.bio,
            u.assigned_dietitian_id,
            d.name AS dietitian_name
     FROM users u

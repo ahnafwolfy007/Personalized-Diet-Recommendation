@@ -211,4 +211,37 @@ INSERT INTO `food_logs` (`log_id`,`user_id`,`food_id`,`quantity_g`,`calories_con
 (86, 14, 44, 150, 157.5, '2026-06-11 19:30:00'),
 (87, 14, 111,150, 135.0, '2026-06-11 19:35:00');
 
+-- ─────────────────────────────────────────────────────────────
+-- 6. USER-CONTRIBUTED FOODS (unverified — pending admin review)
+--    Added by Alice (11) and Bob (12).
+-- ─────────────────────────────────────────────────────────────
+INSERT INTO `foods` (`name`, `calories_per_100g`, `category`, `created_by`, `is_verified`) VALUES
+  ('Homemade Veg Curry',     95,  'Prepared', 11, 0),
+  ('Grandma''s Lentil Stew', 110, 'Prepared', 11, 0),
+  ('Protein Energy Ball',    389, 'Sweet',    12, 0);
+
+-- ─────────────────────────────────────────────────────────────
+-- 7. DATABASE-DRIVEN PLAN ITEMS for Alice's plan (plan_id 2)
+--    Demonstrates the structured plan + "Taken" feature.
+--    Calories = calories_per_100g / 100 * grams.
+-- ─────────────────────────────────────────────────────────────
+INSERT INTO `diet_plan_items` (`plan_id`, `meal`, `food_id`, `quantity_g`, `calories`) VALUES
+  (2, 'breakfast', 5,   150, 106.5),   -- Oatmeal
+  (2, 'breakfast', 77,  100, 89.0),    -- Banana
+  (2, 'lunch',     26,  150, 247.5),   -- Chicken Breast
+  (2, 'lunch',     2,   150, 166.5),   -- Brown Rice
+  (2, 'dinner',    41,  120, 249.6),   -- Salmon
+  (2, 'dinner',    111, 150, 135.0);   -- Sweet Potato
+
+-- ─────────────────────────────────────────────────────────────
+-- 8. WATER LOGS (Alice = 11) across a few days
+-- ─────────────────────────────────────────────────────────────
+INSERT INTO `water_logs` (`user_id`, `amount_ml`, `logged_at`) VALUES
+  (11, 250, '2026-06-13 08:00:00'),
+  (11, 500, '2026-06-13 12:30:00'),
+  (11, 250, '2026-06-13 16:00:00'),
+  (11, 500, '2026-06-13 19:30:00'),
+  (11, 250, '2026-06-12 09:00:00'),
+  (11, 500, '2026-06-12 14:00:00');
+
 SET FOREIGN_KEY_CHECKS = 1;

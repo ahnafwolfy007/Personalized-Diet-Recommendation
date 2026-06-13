@@ -16,9 +16,13 @@ while ($row = $res->fetch_assoc()) {
 $res = $conn->query("SELECT COUNT(*) AS cnt FROM diet_plans");
 $active_plans = (int) $res->fetch_assoc()['cnt'];
 
+$res = $conn->query("SELECT COUNT(*) AS cnt FROM foods WHERE is_verified = 0");
+$pending_foods = (int) $res->fetch_assoc()['cnt'];
+
 json_response([
     'success'          => true,
     'total_patients'   => $counts['patient'],
     'total_dietitians' => $counts['dietitian'],
     'active_plans'     => $active_plans,
+    'pending_foods'    => $pending_foods,
 ]);

@@ -3,6 +3,7 @@
 // Dietitian accepts or rejects a patient request
 
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/helpers.php';
 
 $dietitian_id = require_role('dietitian');
 require_post();
@@ -53,6 +54,10 @@ try {
     error_log('respond_request failed: ' . $e->getMessage());
     json_response(['success' => false, 'message' => 'Could not process the request. Please try again.'], 500);
 }
+
+log_activity($conn, $dietitian_id, 'dietitian',
+    $action === 'accept' ? 'accept_request' : 'reject_request',
+    ($action === 'accept' ? 'Accepted patient #' : 'Rejected request from patient #') . $patient_id);
 
 $message = $action === 'accept'
     ? 'Patient accepted! They are now assigned to you.'

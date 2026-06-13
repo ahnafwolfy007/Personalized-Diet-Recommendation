@@ -55,10 +55,11 @@ include __DIR__ . '/partials/head.php';
                 <th>Calorie Requirement</th>
                 <th>Today's Intake</th>
                 <th>Status</th>
+                <th class="text-right">Action</th>
               </tr>
             </thead>
             <tbody id="patients-table">
-              <tr><td colspan="5" class="text-center text-gray">Loading…</td></tr>
+              <tr><td colspan="6" class="text-center text-gray">Loading…</td></tr>
             </tbody>
           </table>
         </div>
@@ -93,6 +94,7 @@ include __DIR__ . '/partials/head.php';
             '<td class="text-gray">' + escapeHtml(req.gender || '—') + '</td>' +
             '<td class="text-gray">' + escapeHtml(req.created_at) + '</td>' +
             '<td>' +
+              '<a class="btn btn-secondary btn-sm" style="margin-right:6px;" href="profile-view.php?id=' + Number(req.patient_id) + '">View Profile</a>' +
               '<button class="btn btn-primary btn-sm" style="margin-right:6px;" onclick="respondToRequest(' + Number(req.request_id) + ', \'accept\')">Accept</button>' +
               '<button class="btn btn-secondary btn-sm" onclick="respondToRequest(' + Number(req.request_id) + ', \'reject\')">Reject</button>' +
             '</td>' +
@@ -134,7 +136,7 @@ include __DIR__ . '/partials/head.php';
         var tbody = document.getElementById('patients-table');
 
         if (data.patients.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray">No patients assigned yet. Accept patient requests above.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray">No patients assigned yet. Accept patient requests above.</td></tr>';
           return;
         }
 
@@ -148,13 +150,43 @@ include __DIR__ . '/partials/head.php';
             '<td class="text-gray">' + (p.daily_need ? p.daily_need.toLocaleString() + ' kcal' : '—') + '</td>' +
             '<td class="text-gray">' + (p.today_intake ? p.today_intake.toLocaleString() + ' kcal' : '0 kcal') + '</td>' +
             '<td><span class="badge ' + statusClass + '">' + escapeHtml(p.status) + '</span></td>' +
+            '<td class="text-right" style="white-space:nowrap;">' +
+              '<a class="btn btn-secondary btn-sm" style="margin-right:6px;" href="profile-view.php?id=' + Number(p.user_id) + '">View</a>' +
+              '<button class="btn btn-secondary btn-sm js-unassign" data-id="' + Number(p.user_id) + '" data-name="' + escapeHtml(p.name) + '">Unassign</button>' +
+            '</td>' +
             '</tr>';
         }).join('');
       });
   }
 
+  // ── UNASSIGN a patient (with required reason) ───────
+  document.getElementById('patients-table').addEventListener('click', function(e) {
+    var btn = e.target.closest('.js-unassign');
+    if (!btn) return;
+    var patientId = btn.getAttribute('data-id');
+    var patientName = btn.getAttribute('data-name');
+    showReasonModal({
+      title: 'Unassign ' + patientName,
+      label: 'Explain why you are ending this assignment. The reason will be visible to the patient and the admin.',
+      confirmText: 'Unassign patient',
+      onConfirm: function(reason, done) {
+        var fd = new FormData();
+        fd.append('patient_id', patientId);
+        fd.append('reason', reason);
+        fetch('../backend/unassign.php', { method: 'POST', body: fd })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            showToast(data.message, data.success ? 'success' : 'error');
+            if (data.success) { done(); loadPatients(); }
+          })
+          .catch(function() { showToast('Network error. Please try again.', 'error'); });
+      }
+    });
+  });
+
   loadRequests();
   loadPatients();
+  initRemovalNotice();
 </script>
 </body>
 </html>

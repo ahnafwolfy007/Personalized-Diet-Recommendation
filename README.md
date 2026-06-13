@@ -8,11 +8,20 @@ no frameworks, no build step.
 ## Features
 
 - **Patients** — dashboard with a personalized greeting, calorie progress bar and
-  BMI; a type-to-search food picker; one-tap logging and removal of meals; daily
-  reports; their dietitian's meal plan; and a feedback thread with their dietitian.
+  BMI; a type-to-search food picker that sorts your most-used foods first and lets
+  you log in grams or household units (portion, glass, tea-/table-spoon); the
+  ability to add a missing food; an interactive, database-driven diet plan with
+  one-tap "Taken" checkmarks that auto-log the meal; a water-intake tracker; daily
+  reports; a public profile; and a feedback thread with their dietitian.
 - **Dietitians** — accept/reject patient requests, monitor each patient's daily
-  intake at a glance, write/update meal plans, and answer feedback.
-- **Admin** — overview stats and user management.
+  intake, build database-driven meal plans validated against the patient's calorie
+  requirement, a **Patient Analytics** view (intake, adherence, water, last
+  activity), answer feedback, and maintain a professional profile.
+- **Admin** — overview stats, user management with profile inspection, a **Foods**
+  page to verify/edit user-contributed foods, an **Analytics** page, and an
+  **Activity Monitor**.
+- **Both sides** — patients and dietitians can end an assignment with a required
+  reason that the other party (and the admin) can see.
 - **Throughout** — searchable inputs, non-blocking toast notifications, a
   responsive layout with a mobile drawer, password show/hide, and keyboard- and
   screen-reader-friendly controls.
@@ -37,9 +46,10 @@ frontend/   user-facing pages
   partials/           shared head + sidebar
   styles/             base.css (+ user-profile.css)
 database/
-  schema.sql      authoritative schema for a FRESH install (run this)
-  migration.sql   index additions for an EXISTING (pre-consolidation) database
-  dummy_data.sql  optional demo data
+  schema.sql        authoritative schema for a FRESH install (run this)
+  migration.sql     index additions for an EXISTING (pre-consolidation) database
+  migration_v2.sql  feature-upgrade columns + tables for an EXISTING database
+  dummy_data.sql    optional demo data
 ```
 
 ## Setup
@@ -53,9 +63,13 @@ database/
    ```
    mysql -u root dietsync < database/dummy_data.sql
    ```
-   **Existing database** from the old dump? Apply the indexes instead:
+   **Existing database** from the old dump? Apply the indexes first:
    ```
    mysql -u root dietsync < database/migration.sql
+   ```
+   Then apply the feature-upgrade columns and tables:
+   ```
+   mysql -u root dietsync < database/migration_v2.sql
    ```
 3. Adjust credentials in `backend/config.php` if your MySQL user/password differ.
 4. Serve the project root with PHP and open `frontend/index.php`.

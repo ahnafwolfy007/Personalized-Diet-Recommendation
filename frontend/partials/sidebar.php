@@ -13,6 +13,10 @@ $icons = [
     'profile'   => '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
     'feedback'  => '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
     'users'     => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    'water'     => '<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>',
+    'analytics' => '<path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="7"/><rect x="12" y="6" width="3" height="11"/><rect x="17" y="13" width="3" height="4"/>',
+    'foods'     => '<path d="M3 2v7c0 1.1.9 2 2 2h0a2 2 0 0 0 2-2V2"/><path d="M5 2v20"/><path d="M16 2v20"/><path d="M16 8c0-3 1.5-5 3-5v17"/>',
+    'activity'  => '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
     'logout'    => '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
 ];
 
@@ -23,17 +27,23 @@ $menus = [
         ['key' => 'report',    'href' => 'user-report.php',    'label' => 'Daily Report', 'icon' => 'report'],
         ['key' => 'diet-plan', 'href' => 'user-diet-plan.php', 'label' => 'Diet Plan',    'icon' => 'diet-plan'],
         ['key' => 'meal-log',  'href' => 'user-meal-log.php',  'label' => 'Meal Log',     'icon' => 'meal-log'],
+        ['key' => 'water',     'href' => 'user-water.php',     'label' => 'Water Intake', 'icon' => 'water'],
         ['key' => 'feedback',  'href' => 'user-feedback.php',  'label' => 'Feedback',     'icon' => 'feedback'],
         ['key' => 'profile',   'href' => 'user-profile.php',   'label' => 'Profile',      'icon' => 'profile'],
     ],
     'dietitian' => [
-        ['key' => 'dashboard',   'href' => 'dietitian-dashboard.php',   'label' => 'Dashboard',  'icon' => 'dashboard'],
-        ['key' => 'create-plan', 'href' => 'dietitian-create-plan.php', 'label' => 'Meal Plans', 'icon' => 'diet-plan'],
-        ['key' => 'feedback',    'href' => 'dietitian-feedback.php',    'label' => 'Feedback',   'icon' => 'feedback'],
+        ['key' => 'dashboard',   'href' => 'dietitian-dashboard.php',   'label' => 'Dashboard',         'icon' => 'dashboard'],
+        ['key' => 'create-plan', 'href' => 'dietitian-create-plan.php', 'label' => 'Meal Plans',        'icon' => 'diet-plan'],
+        ['key' => 'analytics',   'href' => 'dietitian-analytics.php',   'label' => 'Patient Analytics', 'icon' => 'analytics'],
+        ['key' => 'feedback',    'href' => 'dietitian-feedback.php',    'label' => 'Feedback',          'icon' => 'feedback'],
+        ['key' => 'profile',     'href' => 'dietitian-profile.php',     'label' => 'Profile',           'icon' => 'profile'],
     ],
     'admin' => [
-        ['key' => 'dashboard', 'href' => 'admin-dashboard.php', 'label' => 'Dashboard',       'icon' => 'dashboard'],
-        ['key' => 'users',     'href' => 'admin-users.php',     'label' => 'User Management', 'icon' => 'users'],
+        ['key' => 'dashboard', 'href' => 'admin-dashboard.php', 'label' => 'Dashboard',        'icon' => 'dashboard'],
+        ['key' => 'users',     'href' => 'admin-users.php',     'label' => 'User Management',  'icon' => 'users'],
+        ['key' => 'foods',     'href' => 'admin-foods.php',     'label' => 'Foods',            'icon' => 'foods'],
+        ['key' => 'analytics', 'href' => 'admin-analytics.php', 'label' => 'Analytics',        'icon' => 'analytics'],
+        ['key' => 'activity',  'href' => 'admin-activity.php',  'label' => 'Activity Monitor', 'icon' => 'activity'],
     ],
 ];
 

@@ -970,11 +970,13 @@ tr:hover td {
   right: 0;
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.4);
-  display: flex;
+  display: none;            /* hidden until toggled with .open */
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 1rem;
 }
+.modal-overlay.open { display: flex; }
 
 .modal-content {
   background-color: white;
@@ -1542,3 +1544,144 @@ button:disabled,
   cursor: pointer;
 }
 .row-action:hover { background-color: #fef2f2; }
+
+/* ============================================================
+   Registration role choice (two contrasting cards)
+   ============================================================ */
+.role-choice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.role-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  text-align: left;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 2px solid transparent;
+  cursor: pointer;
+  color: #fff;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.role-card-title { font-size: 1.15rem; font-weight: 600; }
+.role-card-desc  { font-size: 0.85rem; line-height: 1.4; opacity: 0.92; font-weight: 400; }
+
+/* Patient = green, Dietitian = indigo — two clearly contrasting colors. */
+.role-card-patient   { background-color: #16a34a; }
+.role-card-dietitian { background-color: #4f46e5; }
+
+.role-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+  filter: brightness(1.05);
+}
+.role-card:focus-visible { outline: 3px solid #111; outline-offset: 2px; }
+
+@media (max-width: 560px) {
+  .role-choice { grid-template-columns: 1fr; }
+}
+
+/* Selected-role pill on the details step */
+.role-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0.9rem;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #166534;
+}
+
+/* Role-specific fieldsets reset the default fieldset chrome */
+.role-fields { border: none; padding: 0; margin: 0 0 0.5rem; min-width: 0; }
+.role-fields-legend {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #888;
+  margin-bottom: 1rem;
+  padding: 0;
+}
+
+/* ============================================================
+   Public profile view
+   ============================================================ */
+.profile-hero { display: flex; align-items: center; gap: 1.25rem; }
+.profile-avatar {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background-color: #22c55e;
+  color: #fff;
+  font-size: 1.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.profile-details { display: flex; flex-direction: column; }
+.pv-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.pv-row:last-child { border-bottom: none; }
+.pv-label { color: #666; font-size: 0.9rem; }
+.pv-value { font-weight: 500; text-align: right; }
+.pv-bio {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  border-radius: 0.5rem;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+/* ============================================================
+   Meal-plan builder (dietitian) add row
+   ============================================================ */
+.plan-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+.plan-add-row .combo-input { width: 100%; }
+@media (max-width: 640px) {
+  .plan-add-row > * { flex: 1 1 100%; min-width: 0; }
+}
+
+/* ============================================================
+   Assignment-removal notice banner
+   ============================================================ */
+.removal-notice {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+.removal-notice .removal-reason {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  color: #7f1d1d;
+  white-space: pre-wrap;
+}

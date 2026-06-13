@@ -78,6 +78,7 @@ include __DIR__ . '/partials/head.php';
             '<td class="text-gray">' + escapeHtml(joined) + '</td>' +
             '<td>' +
               '<div class="flex items-center gap-2">' +
+                '<a class="btn btn-secondary btn-sm" href="profile-view.php?id=' + Number(u.user_id) + '">View</a>' +
                 '<button class="btn-icon js-delete" title="Delete" data-id="' + Number(u.user_id) + '" data-name="' + escapeHtml(u.name) + '">' +
                   '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>' +
                 '</button>' +
