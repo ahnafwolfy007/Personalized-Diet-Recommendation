@@ -62,10 +62,11 @@ include __DIR__ . '/partials/head.php';
                 <th>Quantity</th>
                 <th class="text-right">Calories</th>
                 <th>Time</th>
+                <th class="text-right">Remove</th>
               </tr>
             </thead>
             <tbody id="ml-table">
-              <tr><td colspan="4" class="text-center text-gray">Loading…</td></tr>
+              <tr><td colspan="5" class="text-center text-gray">Loading…</td></tr>
             </tbody>
           </table>
         </div>
@@ -101,7 +102,7 @@ include __DIR__ . '/partials/head.php';
       .then(function(data) {
         var tbody = document.getElementById('ml-table');
         if (!data.success || data.logs.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" class="text-center text-gray">No food logged for this date.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray">No food logged for this date.</td></tr>';
           document.getElementById('total-entries').textContent = 0;
           document.getElementById('ml-cals').innerHTML = '0 <span class="text-lg text-gray">kcal</span>';
           document.getElementById('ml-largest').textContent = '—';
@@ -120,6 +121,9 @@ include __DIR__ . '/partials/head.php';
             '<td class="text-gray">' + escapeHtml(log.quantity_g) + 'g</td>' +
             '<td class="text-right">' + escapeHtml(log.calories_consumed) + ' kcal</td>' +
             '<td class="text-gray">' + escapeHtml(log.time) + '</td>' +
+            '<td class="text-right"><button class="row-action js-del" data-id="' + Number(log.log_id) + '" title="Remove entry" aria-label="Remove ' + escapeHtml(log.food_name) + '">' +
+              '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>' +
+            '</button></td>' +
             '</tr>';
         }).join('');
 
@@ -147,6 +151,22 @@ include __DIR__ . '/partials/head.php';
     var saved = localStorage.getItem('notes_' + date);
     document.getElementById('notes-area').value = saved || '';
   }
+
+  // Delete a log entry (delegated)
+  document.getElementById('ml-table').addEventListener('click', function(e) {
+    var btn = e.target.closest('.js-del');
+    if (!btn) return;
+    if (!confirm('Remove this entry?')) return;
+    var fd = new FormData();
+    fd.append('log_id', btn.getAttribute('data-id'));
+    fetch('../backend/delete_food_log.php', { method: 'POST', body: fd })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        showToast(data.message, data.success ? 'success' : 'error');
+        if (data.success) loadMealLog();
+      })
+      .catch(function() { showToast('Network error. Please try again.', 'error'); });
+  });
 
   dateInput.addEventListener('change', function() {
     loadMealLog();

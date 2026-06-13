@@ -84,7 +84,7 @@ include __DIR__ . '/partials/head.php';
     var response = textarea ? textarea.value.trim() : '';
 
     if (!response) {
-      alert('Please write a response before sending.');
+      showToast('Please write a response before sending.', 'error');
       return;
     }
 
@@ -95,12 +95,10 @@ include __DIR__ . '/partials/head.php';
     fetch('../backend/dietitian_send_feedback.php', { method: 'POST', body: formData })
       .then(function(r) { return r.json(); })
       .then(function(data) {
-        if (data.success) {
-          loadFeedback();
-        } else {
-          alert('Error: ' + data.message);
-        }
-      });
+        showToast(data.message, data.success ? 'success' : 'error');
+        if (data.success) loadFeedback();
+      })
+      .catch(function() { showToast('Network error. Please try again.', 'error'); });
   }
 
   loadFeedback();

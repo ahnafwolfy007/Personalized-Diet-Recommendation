@@ -52,13 +52,16 @@ while ($log = $logs_result->fetch_assoc()) {
 }
 $stmt->close();
 
+$profile_complete = ((float) $user['height_cm'] > 0 && (float) $user['weight_kg'] > 0 && (int) $user['age'] > 0);
+
 json_response([
-    'success'      => true,
-    'name'         => $user['name'],
-    'daily_need'   => $daily_need,
-    'today_intake' => $today_intake,
-    'remaining'    => $remaining,
-    'bmi'          => $bmi ?? '',
-    'bmi_label'    => $bmi === null ? 'N/A' : $bmi_label,
-    'recent_logs'  => $recent_logs,
+    'success'          => true,
+    'name'             => $user['name'],
+    'daily_need'       => $daily_need,
+    'today_intake'     => $today_intake,
+    'remaining'        => $remaining,
+    'bmi'              => $bmi ?? '',
+    'bmi_label'        => $bmi === null ? 'N/A' : $bmi_label,
+    'profile_complete' => $profile_complete,
+    'recent_logs'      => $recent_logs,
 ]);

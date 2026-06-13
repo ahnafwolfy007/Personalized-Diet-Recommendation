@@ -26,7 +26,6 @@ include __DIR__ . '/partials/head.php';
       <!-- Compose box -->
       <div id="compose" class="hidden card p-6 mb-8">
         <h2 class="text-xl mb-4">New Message</h2>
-        <div id="send-msg" class="hidden mb-4 p-3 rounded text-sm"></div>
         <form id="feedback-form">
           <div class="form-group">
             <textarea id="message" name="message" rows="4" maxlength="2000"
@@ -107,22 +106,17 @@ include __DIR__ . '/partials/head.php';
 
   document.getElementById('feedback-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    var btn    = document.getElementById('send-btn');
-    var msgBox = document.getElementById('send-msg');
-    var field  = document.getElementById('message');
+    var btn   = document.getElementById('send-btn');
+    var field = document.getElementById('message');
 
-    if (!field.value.trim()) return;
+    if (!field.value.trim()) { showToast('Please write a message first.', 'error'); return; }
 
     btn.disabled = true;
 
     fetch('../backend/patient_send_feedback.php', { method: 'POST', body: new FormData(this) })
       .then(function(r) { return r.json(); })
       .then(function(data) {
-        msgBox.textContent = data.message;
-        msgBox.className = data.success
-          ? 'mb-4 p-3 rounded text-sm bg-green-light text-green border border-green'
-          : 'mb-4 p-3 rounded text-sm bg-red-light text-red border border-red';
-        msgBox.classList.remove('hidden');
+        showToast(data.message, data.success ? 'success' : 'error');
         btn.disabled = false;
         if (data.success) {
           field.value = '';
@@ -131,9 +125,7 @@ include __DIR__ . '/partials/head.php';
       })
       .catch(function() {
         btn.disabled = false;
-        msgBox.textContent = 'Could not send. Please try again later.';
-        msgBox.className = 'mb-4 p-3 rounded text-sm bg-red-light text-red border border-red';
-        msgBox.classList.remove('hidden');
+        showToast('Could not send. Please try again later.', 'error');
       });
   });
 

@@ -1366,3 +1366,179 @@ button:disabled,
   .card { padding: 1.25rem; }
   th, td { padding: 0.75rem; }
 }
+
+/* ============================================================
+   Toast notifications
+   ============================================================ */
+.toast-region {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: calc(100vw - 2rem);
+  pointer-events: none;
+}
+
+.toast {
+  min-width: 240px;
+  max-width: 360px;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  color: #fff;
+  background-color: #333;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast-success { background-color: #16a34a; }
+.toast-error   { background-color: #dc2626; }
+.toast-info    { background-color: #2563eb; }
+
+@media (max-width: 480px) {
+  .toast-region { left: 1rem; right: 1rem; }
+  .toast { max-width: 100%; }
+}
+
+/* ============================================================
+   Searchable combobox (food picker)
+   ============================================================ */
+.combo { position: relative; }
+
+.combo-list {
+  list-style: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  margin: 0;
+  padding: 0.25rem;
+  max-height: 16rem;
+  overflow-y: auto;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.combo-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.combo-option:hover,
+.combo-option.active {
+  background-color: #f0fdf4;
+}
+
+.combo-option .combo-cat {
+  font-size: 0.75rem;
+  color: #888;
+  white-space: nowrap;
+}
+
+.combo-empty {
+  padding: 0.75rem;
+  text-align: center;
+  color: #888;
+  font-size: 0.875rem;
+}
+
+/* ============================================================
+   Password field with show/hide toggle
+   ============================================================ */
+.input-with-action { position: relative; }
+.input-with-action input { padding-right: 3rem; }
+
+.pw-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 0.375rem;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+}
+.pw-toggle:hover { color: #111; background-color: #f5f5f5; }
+.pw-toggle .icon-eye-off { display: none; }
+.pw-toggle.is-on .icon-eye { display: none; }
+.pw-toggle.is-on .icon-eye-off { display: inline; }
+
+/* ============================================================
+   Dashboard hero + calorie progress
+   ============================================================ */
+.dash-hero { margin-bottom: 2rem; }
+.dash-greeting { font-size: 1.875rem; font-weight: 500; }
+.dash-subtitle { color: #666; margin-top: 0.25rem; }
+
+.calorie-card { margin-bottom: 2rem; }
+
+.calorie-bar-track {
+  height: 0.75rem;
+  background-color: #eee;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+.calorie-bar-fill {
+  height: 100%;
+  width: 0;
+  background-color: #22c55e;
+  border-radius: 9999px;
+  transition: width 0.5s ease, background-color 0.3s ease;
+}
+.calorie-bar-fill.over { background-color: #ef4444; }
+
+/* Profile-completeness nudge */
+.nudge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background-color: #fefce8;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 2rem;
+}
+.nudge .nudge-text { flex: 1; min-width: 12rem; }
+
+/* Icon-only row action buttons (e.g. delete a log entry) */
+.row-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: none;
+  border-radius: 0.375rem;
+  color: #ef4444;
+  cursor: pointer;
+}
+.row-action:hover { background-color: #fef2f2; }

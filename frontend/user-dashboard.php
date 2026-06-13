@@ -14,7 +14,37 @@ include __DIR__ . '/partials/head.php';
   <!-- Main Content -->
   <main class="main-content">
     <div class="max-w-1200">
-      <h1 class="text-3xl mb-8">Dashboard</h1>
+
+      <!-- Greeting -->
+      <div class="dash-hero flex items-center justify-between gap-4">
+        <div>
+          <h1 class="dash-greeting" id="greeting">Dashboard</h1>
+          <p class="dash-subtitle" id="today-date"></p>
+        </div>
+        <a href="user-log-food.php" class="btn btn-primary flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Log Food
+        </a>
+      </div>
+
+      <!-- Profile completeness nudge (shown only when metrics are missing) -->
+      <div id="profile-nudge" class="nudge hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#92400e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span class="nudge-text">Complete your age, height and weight to get an accurate daily calorie target.</span>
+        <a href="user-profile.php" class="btn btn-primary btn-sm">Complete Profile</a>
+      </div>
+
+      <!-- Calorie progress -->
+      <div class="card calorie-card p-6">
+        <div class="flex justify-between items-baseline mb-2">
+          <h2 class="text-xl">Today's Calories</h2>
+          <span id="cal-summary" class="text-gray text-sm">—</span>
+        </div>
+        <div class="calorie-bar-track">
+          <div class="calorie-bar-fill" id="cal-bar"></div>
+        </div>
+        <p class="text-sm text-gray mt-2" id="cal-status">—</p>
+      </div>
 
       <!-- Summary Cards -->
       <div class="grid grid-cols-4 gap-6 mb-8">
@@ -57,8 +87,9 @@ include __DIR__ . '/partials/head.php';
 
       <!-- Recent Food Logs -->
       <div class="bg-white border rounded-lg">
-        <div class="p-6 border-b">
+        <div class="p-6 border-b flex justify-between items-center">
           <h2 class="text-xl">Recent Food Logs</h2>
+          <a href="user-meal-log.php" class="text-green link-clean text-sm">View all →</a>
         </div>
         <div class="overflow-x-auto">
           <table>
@@ -83,31 +114,65 @@ include __DIR__ . '/partials/head.php';
 </div>
 
 <script>
-  // Load dashboard data from backend
+  // Friendly date + time-of-day greeting
+  (function () {
+    var now = new Date();
+    var hour = now.getHours();
+    var part = hour < 12 ? 'Good morning' : (hour < 18 ? 'Good afternoon' : 'Good evening');
+    document.getElementById('greeting').setAttribute('data-part', part);
+    document.getElementById('today-date').textContent =
+      now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+  })();
+
   fetch('../backend/get_dashboard.php')
     .then(function(res) { return res.json(); })
     .then(function(data) {
-      if (data.success) {
-        document.getElementById('daily-need').textContent   = data.daily_need.toLocaleString();
-        document.getElementById('today-intake').textContent = data.today_intake.toLocaleString();
-        document.getElementById('remaining').textContent    = data.remaining.toLocaleString();
-        document.getElementById('bmi').textContent          = data.bmi || '—';
-        document.getElementById('bmi-label').textContent    = data.bmi_label || '—';
+      if (!data.success) { window.location.href = 'login.php'; return; }
 
-        var tbody = document.getElementById('food-log-table');
-        if (data.recent_logs.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" class="text-center text-gray">No food logged today.</td></tr>';
-        } else {
-          tbody.innerHTML = data.recent_logs.map(function(log) {
-            return '<tr><td>' + escapeHtml(log.food_name) + '</td>' +
-                   '<td class="text-gray">' + escapeHtml(log.quantity_g) + 'g</td>' +
-                   '<td>' + escapeHtml(log.calories_consumed) + ' kcal</td>' +
-                   '<td class="text-gray">' + escapeHtml(log.logged_at) + '</td></tr>';
-          }).join('');
-        }
+      var part = document.getElementById('greeting').getAttribute('data-part');
+      var firstName = (data.name || '').split(' ')[0];
+      document.getElementById('greeting').textContent = part + (firstName ? ', ' + firstName : '');
+
+      document.getElementById('daily-need').textContent   = data.daily_need.toLocaleString();
+      document.getElementById('today-intake').textContent = data.today_intake.toLocaleString();
+      document.getElementById('remaining').textContent    = data.remaining.toLocaleString();
+      document.getElementById('bmi').textContent          = data.bmi || '—';
+      document.getElementById('bmi-label').textContent    = data.bmi_label || '—';
+
+      // Profile nudge when metrics are missing
+      if (!data.profile_complete) {
+        document.getElementById('profile-nudge').classList.remove('hidden');
+      }
+
+      // Calorie progress bar
+      var bar     = document.getElementById('cal-bar');
+      var summary = document.getElementById('cal-summary');
+      var status  = document.getElementById('cal-status');
+      if (data.daily_need > 0) {
+        var pct = Math.round((data.today_intake / data.daily_need) * 100);
+        bar.style.width = Math.min(pct, 100) + '%';
+        bar.classList.toggle('over', pct > 100);
+        summary.textContent = data.today_intake.toLocaleString() + ' / ' + data.daily_need.toLocaleString() + ' kcal (' + pct + '%)';
+        status.textContent = pct > 100
+          ? 'You are ' + (data.today_intake - data.daily_need).toLocaleString() + ' kcal over your target.'
+          : data.remaining.toLocaleString() + ' kcal remaining today.';
       } else {
-        // Not logged in – redirect to login
-        window.location.href = 'login.php';
+        bar.style.width = '0%';
+        summary.textContent = 'Set up your profile';
+        status.textContent = 'Add your age, height and weight to track progress against a target.';
+      }
+
+      // Recent logs
+      var tbody = document.getElementById('food-log-table');
+      if (data.recent_logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-gray">No food logged today. <a href="user-log-food.php" class="text-green">Log your first meal →</a></td></tr>';
+      } else {
+        tbody.innerHTML = data.recent_logs.map(function(log) {
+          return '<tr><td>' + escapeHtml(log.food_name) + '</td>' +
+                 '<td class="text-gray">' + escapeHtml(log.quantity_g) + 'g</td>' +
+                 '<td>' + escapeHtml(log.calories_consumed) + ' kcal</td>' +
+                 '<td class="text-gray">' + escapeHtml(log.logged_at) + '</td></tr>';
+        }).join('');
       }
     })
     .catch(function() {

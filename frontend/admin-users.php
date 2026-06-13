@@ -19,9 +19,6 @@ include __DIR__ . '/partials/head.php';
         <h1 class="text-3xl">User Management</h1>
       </div>
 
-      <!-- Status message -->
-      <div id="action-msg" class="hidden mb-4 p-3 rounded text-sm"></div>
-
       <div class="bg-white border rounded-lg">
         <div class="p-6 border-b">
           <h2 class="text-xl">All Users</h2>
@@ -107,14 +104,10 @@ include __DIR__ . '/partials/head.php';
     fetch('../backend/admin_delete_user.php', { method: 'POST', body: formData })
       .then(function(r) { return r.json(); })
       .then(function(data) {
-        var msg = document.getElementById('action-msg');
-        msg.textContent = data.message;
-        msg.className = data.success
-          ? 'mb-4 p-3 rounded text-sm bg-green-light text-green border border-green'
-          : 'mb-4 p-3 rounded text-sm bg-red-light text-red border border-red';
-        msg.classList.remove('hidden');
+        showToast(data.message, data.success ? 'success' : 'error');
         if (data.success) loadUsers();
-      });
+      })
+      .catch(function() { showToast('Network error. Please try again.', 'error'); });
   }
 
   loadUsers();

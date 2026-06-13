@@ -2,6 +2,47 @@
 
 All notable changes to DietSync are documented here.
 
+## [Usability & engagement] – 2026-06-13
+
+A follow-up pass focused on making the app friendlier, more accessible, and more
+engaging — still vanilla PHP/JS/CSS, no dependencies. Every new flow was verified
+against the running database (food search, add/delete logs with ownership and
+CSRF checks, the dashboard target, and the incomplete-profile path).
+
+### New features
+
+- **Searchable food picker.** The Log Food page replaced the 239-option
+  `<select>` with a type-to-search combobox (filters by name or category,
+  keyboard arrow/Enter/Escape support, ARIA `combobox`/`listbox` roles). You can
+  also click any row in the Food Database table to select it.
+  *Files: `frontend/user-log-food.php`.*
+
+- **Remove a logged meal.** Patients can now delete their own food log entries
+  from both Log Food and Meal Log. New endpoint `backend/delete_food_log.php`
+  enforces ownership (`WHERE log_id = ? AND user_id = ?`) and CSRF.
+  *Verified: own delete succeeds; deleting another user's entry or re-deleting
+  returns 404; a request without the CSRF token returns 419.*
+
+- **Engaging dashboard.** Added a time-of-day greeting with the user's first
+  name and the date, a calorie progress bar (turns red when over target), a
+  "Log Food" quick action, "View all" / "Log your first meal" links, and a
+  profile-completeness nudge that appears when age/height/weight are missing so
+  the calorie target isn't a silent `0`. `get_dashboard.php` now returns a
+  `profile_complete` flag.
+
+- **Password visibility toggle** on the login and registration forms
+  (accessible button with `aria-pressed`/`aria-label`).
+
+### Experience & accessibility
+
+- **Toast notifications.** Added a shared, non-blocking toast system
+  (`showToast()` in `assets/app.js`, styles in `base.css`) with an `aria-live`
+  region. Replaced blocking `alert()` calls and several ad-hoc inline message
+  boxes (dietitian feedback & requests, admin user delete, patient feedback,
+  food add/delete) with consistent toasts.
+- Icon-only buttons (delete entry) carry descriptive `aria-label`s; the combobox
+  and password toggle expose proper roles/states.
+
 ## [Production hardening] – 2026-06-13
 
 A focused pass that closed the critical security gaps, fixed the data-access

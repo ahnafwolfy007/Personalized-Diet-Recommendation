@@ -22,8 +22,6 @@ include __DIR__ . '/partials/head.php';
           <h2 class="text-xl">Pending Patient Requests</h2>
           <p class="text-sm text-gray mt-1">Patients who want to be assigned to you. Accept or Reject their requests.</p>
         </div>
-        <!-- Message box for accept/reject feedback -->
-        <div id="request-action-msg" class="hidden mx-6 mt-4 p-3 rounded text-sm"></div>
         <div class="overflow-x-auto">
           <table>
             <thead>
@@ -109,8 +107,6 @@ include __DIR__ . '/partials/head.php';
 
   // ── ACCEPT OR REJECT a patient request ──────────────
   function respondToRequest(requestId, action) {
-    var msgDiv = document.getElementById('request-action-msg');
-
     var formData = new FormData();
     formData.append('request_id', requestId);
     formData.append('action', action);
@@ -118,20 +114,14 @@ include __DIR__ . '/partials/head.php';
     fetch('../backend/dietitian_respond_request.php', { method: 'POST', body: formData })
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      msgDiv.textContent      = data.message;
-      msgDiv.style.background = data.success ? '#dcfce7' : '#fee2e2';
-      msgDiv.style.color      = data.success ? '#166534' : '#991b1b';
-      msgDiv.style.border     = data.success ? '1px solid #86efac' : '1px solid #fca5a5';
-      msgDiv.classList.remove('hidden');
-
+      showToast(data.message, data.success ? 'success' : 'error');
       if (data.success) {
         loadRequests();
         loadPatients();
       }
     })
     .catch(function() {
-      msgDiv.textContent = 'An error occurred. Please try again.';
-      msgDiv.classList.remove('hidden');
+      showToast('An error occurred. Please try again.', 'error');
     });
   }
 

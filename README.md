@@ -5,6 +5,18 @@ dietitians review assigned patients and write meal plans, and an admin manages u
 Built with vanilla PHP (mysqli), plain JavaScript, and a small hand-written CSS system —
 no frameworks, no build step.
 
+## Features
+
+- **Patients** — dashboard with a personalized greeting, calorie progress bar and
+  BMI; a type-to-search food picker; one-tap logging and removal of meals; daily
+  reports; their dietitian's meal plan; and a feedback thread with their dietitian.
+- **Dietitians** — accept/reject patient requests, monitor each patient's daily
+  intake at a glance, write/update meal plans, and answer feedback.
+- **Admin** — overview stats and user management.
+- **Throughout** — searchable inputs, non-blocking toast notifications, a
+  responsive layout with a mobile drawer, password show/hide, and keyboard- and
+  screen-reader-friendly controls.
+
 ## Tech stack
 
 - **Backend:** PHP 8 + MySQL/MariaDB (`mysqli`, prepared statements)
