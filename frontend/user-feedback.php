@@ -1,0 +1,143 @@
+<?php
+require_once __DIR__ . '/guard.php';
+$authUser  = guard('patient');
+$pageTitle = 'DietSync – Feedback';
+$navRole   = 'patient';
+$navActive = 'feedback';
+include __DIR__ . '/partials/head.php';
+?>
+<body>
+<div class="page-wrapper">
+
+  <?php include __DIR__ . '/partials/sidebar.php'; ?>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="max-w-1200">
+      <h1 class="text-3xl mb-2">Feedback</h1>
+      <p class="text-gray mb-8">Send questions or feedback to your dietitian and see their replies.</p>
+
+      <!-- No dietitian state -->
+      <div id="no-dietitian" class="hidden card p-8 text-center text-gray">
+        <p class="text-xl mb-2">No dietitian assigned yet.</p>
+        <p>Choose a dietitian from your <a href="user-profile.php" class="text-green link-clean">Profile</a> page to start a conversation.</p>
+      </div>
+
+      <!-- Compose box -->
+      <div id="compose" class="hidden card p-6 mb-8">
+        <h2 class="text-xl mb-4">New Message</h2>
+        <div id="send-msg" class="hidden mb-4 p-3 rounded text-sm"></div>
+        <form id="feedback-form">
+          <div class="form-group">
+            <textarea id="message" name="message" rows="4" maxlength="2000"
+              placeholder="Ask a question or share how your plan is going…" required></textarea>
+          </div>
+          <button type="submit" id="send-btn" class="btn btn-primary flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send
+          </button>
+        </form>
+      </div>
+
+      <!-- Thread -->
+      <div id="feedback-list">
+        <p class="text-center text-gray">Loading…</p>
+      </div>
+
+    </div>
+  </main>
+
+</div>
+
+<script>
+  function loadFeedback() {
+    fetch('../backend/patient_get_feedback.php')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.success) { window.location.href = 'login.php'; return; }
+
+        var list = document.getElementById('feedback-list');
+
+        if (!data.has_dietitian) {
+          document.getElementById('no-dietitian').classList.remove('hidden');
+          document.getElementById('compose').classList.add('hidden');
+          list.innerHTML = '';
+          return;
+        }
+
+        document.getElementById('no-dietitian').classList.add('hidden');
+        document.getElementById('compose').classList.remove('hidden');
+
+        if (data.feedbacks.length === 0) {
+          list.innerHTML = '<div class="card p-8 text-center text-gray"><p>No messages yet. Send your first message above.</p></div>';
+          return;
+        }
+
+        list.innerHTML = data.feedbacks.map(function(fb) {
+          var statusBadge = fb.status === 'responded'
+            ? '<span class="badge badge-green">Answered</span>'
+            : '<span class="badge badge-yellow">Awaiting reply</span>';
+
+          var responseSection = '';
+          if (fb.status === 'responded' && fb.response) {
+            responseSection = '<div class="response-box">' +
+              '<p class="text-sm text-gray mb-1">Reply from ' + escapeHtml(fb.dietitian_name) + ':</p>' +
+              '<p class="text-gray" style="white-space:pre-wrap;">' + escapeHtml(fb.response) + '</p>' +
+              '</div>';
+          }
+
+          return '<div class="card p-6 mb-4">' +
+            '<div class="flex items-start justify-between mb-4">' +
+              '<div>' +
+                '<h3 class="card-name">You</h3>' +
+                '<p class="text-sm text-gray">' + escapeHtml(fb.created_at) + '</p>' +
+              '</div>' +
+              statusBadge +
+            '</div>' +
+            '<div class="note-box mb-4"><p class="text-gray" style="white-space:pre-wrap;">' + escapeHtml(fb.message) + '</p></div>' +
+            responseSection +
+            '</div>';
+        }).join('');
+      })
+      .catch(function() {
+        document.getElementById('feedback-list').innerHTML =
+          '<div class="card p-8 text-center text-gray"><p>Could not load feedback. Please try again later.</p></div>';
+      });
+  }
+
+  document.getElementById('feedback-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var btn    = document.getElementById('send-btn');
+    var msgBox = document.getElementById('send-msg');
+    var field  = document.getElementById('message');
+
+    if (!field.value.trim()) return;
+
+    btn.disabled = true;
+
+    fetch('../backend/patient_send_feedback.php', { method: 'POST', body: new FormData(this) })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        msgBox.textContent = data.message;
+        msgBox.className = data.success
+          ? 'mb-4 p-3 rounded text-sm bg-green-light text-green border border-green'
+          : 'mb-4 p-3 rounded text-sm bg-red-light text-red border border-red';
+        msgBox.classList.remove('hidden');
+        btn.disabled = false;
+        if (data.success) {
+          field.value = '';
+          loadFeedback();
+        }
+      })
+      .catch(function() {
+        btn.disabled = false;
+        msgBox.textContent = 'Could not send. Please try again later.';
+        msgBox.className = 'mb-4 p-3 rounded text-sm bg-red-light text-red border border-red';
+        msgBox.classList.remove('hidden');
+      });
+  });
+
+  loadFeedback();
+</script>
+</body>
+</html>

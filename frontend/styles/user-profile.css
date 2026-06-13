@@ -1,0 +1,169 @@
+/* user-profile.css — page-specific styles.
+   base.css is linked directly in the page <head>, so no @import here. */
+
+/* ── Info rows (view mode) ─────────────────────────── */
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+.info-row:last-child { border-bottom: none; }
+.info-row-icon { color: #999; flex-shrink: 0; margin-top: 2px; }
+.info-row-label { font-size: 0.78rem; color: #999; margin-bottom: 2px; }
+.info-row-value { font-weight: 500; color: #111; }
+
+/* ── Dietitian card (no-dietitian state) ───────────── */
+.no-dietitian-card {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.no-dietitian-card .nd-text h3 { font-size: 1rem; font-weight: 600; color: #166534; margin-bottom: 0.2rem; }
+.no-dietitian-card .nd-text p  { font-size: 0.85rem; color: #15803d; }
+
+/* Pending banner */
+.pending-banner {
+  background: #fefce8;
+  border: 1px solid #fde68a;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #92400e;
+}
+.pending-banner .pb-icon { font-size: 1.3rem; flex-shrink: 0; }
+
+/* Assigned dietitian banner */
+.assigned-banner {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.assigned-banner .ab-icon { font-size: 1.5rem; flex-shrink: 0; }
+.assigned-banner .ab-label { font-size: 0.78rem; color: #166534; }
+.assigned-banner .ab-name  { font-size: 1rem; font-weight: 600; color: #14532d; }
+
+/* ── MODAL overlay ─────────────────────────────────── */
+.modal-overlay {
+  display: none;                 /* hidden by default */
+  position: fixed;
+  top: 0;                        /* cover the full screen */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;                 /* on top of everything */
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.modal-overlay.open { display: flex; }
+
+.modal-box {
+  background: white;
+  border-radius: 0.75rem;
+  width: 100%;
+  max-width: 500px;
+  min-height: 320px;             /* never collapses to a tiny box */
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+.modal-header h3 { font-size: 1.1rem; font-weight: 600; }
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+  border-radius: 0.375rem;
+  transition: background 0.15s;
+}
+.modal-close-btn:hover { background: #f5f5f5; color: #111; }
+
+.modal-body {
+  padding: 1.25rem 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-msg {
+  display: none;
+  padding: 0.65rem 1rem;
+  border-radius: 0.4rem;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+/* Dietitian list cards inside modal */
+.dietitian-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  margin-bottom: 0.65rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+.dietitian-item:last-child { margin-bottom: 0; }
+.dietitian-item:hover { border-color: #22c55e; background: #f0fdf4; }
+
+.di-avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  background: #22c55e;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+.di-info { flex: 1; padding: 0 0.75rem; }
+.di-info .di-name   { font-weight: 600; font-size: 0.95rem; color: #111; }
+.di-info .di-role   { font-size: 0.78rem; color: #666; }
+
+.btn-request {
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 0.4rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+.btn-request:hover { background: #16a34a; }
+.btn-request:disabled { background: #aaa; cursor: default; }
