@@ -32,7 +32,17 @@ if (!$u || $u['role'] === 'admin') {
     json_response(['success' => false, 'message' => 'Profile not found.'], 404);
 }
 
-$is_self     = ($target_id === $viewer_id);
+$is_self = ($target_id === $viewer_id);
+
+// Authorization: dietitian profiles are viewable by any logged-in user (patients
+// choose a dietitian, etc.). Patient profiles — which carry health data — are only
+// viewable by the admin, a dietitian (deciding on a request), or the patient
+// themselves. This prevents one patient from enumerating another's health info.
+if ($u['role'] === 'patient' && !$is_self
+    && $viewer_role !== 'admin' && $viewer_role !== 'dietitian') {
+    json_response(['success' => false, 'message' => 'You are not allowed to view this profile.'], 403);
+}
+
 $can_see_email = $is_self || $viewer_role === 'admin';
 
 $profile = [
