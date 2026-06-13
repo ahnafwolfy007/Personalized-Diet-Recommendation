@@ -17,9 +17,9 @@ $patient_id = intval($_POST['patient_id'] ?? 0);
 $notes      = trim($_POST['notes'] ?? '');
 $itemsJson  = $_POST['items'] ?? '[]';
 
-// Optional dietitian-set daily water goal for the patient.
+// Optional dietitian-set daily water goal for the patient (defaults to 2000 ml).
 $water_goal = isset($_POST['water_goal_ml']) ? intval($_POST['water_goal_ml']) : 0;
-$water_goal = ($water_goal > 0 && $water_goal <= 10000) ? $water_goal : null;
+$water_goal = ($water_goal > 0 && $water_goal <= 10000) ? $water_goal : 2000;
 
 if ($patient_id <= 0) {
     json_response(['success' => false, 'message' => 'Please select a patient.']);

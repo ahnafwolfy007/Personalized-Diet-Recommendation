@@ -21,9 +21,10 @@ if ($role === 'patient') {
         LEFT JOIN (
             SELECT food_id, COUNT(*) AS uses, MAX(logged_at) AS last_logged
             FROM food_logs
-            WHERE user_id = ? AND entry_type = 'food' AND food_id IS NOT NULL
+            WHERE user_id = ? AND entry_type = 'food'
             GROUP BY food_id
         ) u ON u.food_id = f.food_id
+        WHERE f.name <> 'Drinking Water'
         ORDER BY (u.uses IS NULL), u.last_logged DESC, u.uses DESC, f.category, f.name
     ");
     $stmt->bind_param('i', $user_id);
@@ -38,7 +39,7 @@ if ($role === 'patient') {
     }
     $stmt->close();
 } else {
-    $result = $conn->query("SELECT food_id, name, calories_per_100g, category, is_verified FROM foods ORDER BY category, name");
+    $result = $conn->query("SELECT food_id, name, calories_per_100g, category, is_verified FROM foods WHERE name <> 'Drinking Water' ORDER BY category, name");
     $foods = [];
     while ($row = $result->fetch_assoc()) {
         $row['is_verified'] = (int) $row['is_verified'];

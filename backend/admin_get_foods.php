@@ -17,8 +17,9 @@ $like = '%' . $q . '%';
 // Global pending count (independent of the current page / filter).
 $pending = (int) $conn->query("SELECT COUNT(*) AS c FROM foods WHERE is_verified = 0")->fetch_assoc()['c'];
 
+// The built-in "Drinking Water" food is plumbing for water logging — hide it.
 if ($q !== '') {
-    $countStmt = $conn->prepare("SELECT COUNT(*) AS c FROM foods WHERE name LIKE ? OR category LIKE ?");
+    $countStmt = $conn->prepare("SELECT COUNT(*) AS c FROM foods WHERE name <> 'Drinking Water' AND (name LIKE ? OR category LIKE ?)");
     $countStmt->bind_param('ss', $like, $like);
     $countStmt->execute();
     $total = (int) $countStmt->get_result()->fetch_assoc()['c'];
@@ -28,18 +29,19 @@ if ($q !== '') {
         SELECT f.food_id, f.name, f.calories_per_100g, f.category, f.is_verified, f.created_at, u.name AS author
         FROM foods f
         LEFT JOIN users u ON u.user_id = f.created_by
-        WHERE f.name LIKE ? OR f.category LIKE ?
+        WHERE f.name <> 'Drinking Water' AND (f.name LIKE ? OR f.category LIKE ?)
         ORDER BY f.is_verified ASC, f.created_at DESC, f.name ASC
         LIMIT ? OFFSET ?
     ");
     $stmt->bind_param('ssii', $like, $like, $perPage, $offset);
 } else {
-    $total = (int) $conn->query("SELECT COUNT(*) AS c FROM foods")->fetch_assoc()['c'];
+    $total = (int) $conn->query("SELECT COUNT(*) AS c FROM foods WHERE name <> 'Drinking Water'")->fetch_assoc()['c'];
 
     $stmt = $conn->prepare("
         SELECT f.food_id, f.name, f.calories_per_100g, f.category, f.is_verified, f.created_at, u.name AS author
         FROM foods f
         LEFT JOIN users u ON u.user_id = f.created_by
+        WHERE f.name <> 'Drinking Water'
         ORDER BY f.is_verified ASC, f.created_at DESC, f.name ASC
         LIMIT ? OFFSET ?
     ");

@@ -2,6 +2,33 @@
 
 All notable changes to DietSync are documented here.
 
+## [Single clean database] – 2026-06-14
+
+Removed the migration files in favour of one complete, self-contained database
+file, and tightened the schema so there are no stray NULLs.
+
+- **`schema.sql` is now the only database file.** It drops and recreates the
+  whole `dietsync` database, so there are no migrations to track and no leftover
+  tables (the old `water_logs` / `meal_completions` simply don't exist).
+  `migration.sql` and `migration_v2.sql` were deleted.
+- **No nullable id columns for the common path.** Water entries reference a
+  built-in `Drinking Water` food (so `food_logs.food_id` is never NULL — the food
+  is hidden from the food picker and can't be deleted); `plan_item_id` and
+  `serving_amount` default to `0`; `diet_plans.water_goal_ml` defaults to `2000`.
+  The only intentionally-nullable foreign keys are `users.assigned_dietitian_id`
+  (admins/dietitians/unassigned patients have none) and `foods.created_by`
+  (built-in foods have no author).
+- **Dropped the legacy free-text plan columns** (`breakfast_text`/`lunch_text`/
+  `dinner_text`) — plans are fully database-driven now.
+- **Rewritten `dummy_data.sql`:** four patients assigned to the two seeded
+  dietitians, with full plans, plan items, food + water logs and answered
+  feedback. Every column is populated — no NULL or empty values, and every id is
+  present.
+- Updated `README.md` and `SETUP.md` to the single-file workflow.
+
+> Upgrading an existing local database? Just re-run `database/schema.sql` (it
+> recreates everything from scratch). Back up first if you need the old data.
+
 ## [Pagination] – 2026-06-14
 
 Server-side pagination for every growable list, so pages fetch one slice of rows

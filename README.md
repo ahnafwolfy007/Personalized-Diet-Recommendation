@@ -48,30 +48,23 @@ frontend/   user-facing pages
   partials/           shared head + sidebar
   styles/             base.css (+ user-profile.css)
 database/
-  schema.sql        authoritative schema for a FRESH install (run this)
-  migration.sql     index additions for an EXISTING (pre-consolidation) database
-  migration_v2.sql  feature-upgrade columns + tables for an EXISTING database
-  dummy_data.sql    optional demo data
+  schema.sql      the complete database — drops & recreates everything (run this)
+  dummy_data.sql  optional demo data
 ```
 
 ## Setup
 
+See **[SETUP.md](SETUP.md)** for full step-by-step instructions. In short:
+
 1. Start MySQL/MariaDB (e.g. via XAMPP).
-2. Create the database and tables (**fresh install**):
+2. Create the database — `schema.sql` is one complete file that drops and
+   recreates everything (no migrations to track):
    ```
    mysql -u root < database/schema.sql
    ```
-   Optional demo data (dietitians, patients, plans, logs, feedback):
+   Optional demo data (patients, plans, food/water logs, feedback):
    ```
    mysql -u root dietsync < database/dummy_data.sql
-   ```
-   **Existing database** from the old dump? Apply the indexes first:
-   ```
-   mysql -u root dietsync < database/migration.sql
-   ```
-   Then apply the feature-upgrade columns and tables:
-   ```
-   mysql -u root dietsync < database/migration_v2.sql
    ```
 3. Adjust credentials in `backend/config.php` if your MySQL user/password differ.
 4. Serve the project root with PHP and open `frontend/index.php`.
@@ -86,13 +79,15 @@ Seeded by `schema.sql` — password is **`password`**:
 | Dietitian | sarah@dietsync.com    |
 | Patient   | john@dietsync.com     |
 
-Seeded by `dummy_data.sql` (richer history) — password is **`password123`**:
+Seeded by `dummy_data.sql` — four patients (password **`password123`**) assigned
+to the seeded dietitians, each with a plan, food/water logs and feedback:
 
-| Role      | Email                | Notes                          |
-|-----------|----------------------|--------------------------------|
-| Dietitian | emma@dietsync.com    | has Alice & Bob assigned       |
-| Patient   | alice@dietsync.com   | plan + food logs + feedback    |
-| Patient   | bob@dietsync.com     | plan + food logs               |
+| Patient         | Email               | Dietitian          |
+|-----------------|---------------------|--------------------|
+| Alice Thompson  | alice@dietsync.com  | Dr. Sarah Johnson  |
+| Bob Martinez    | bob@dietsync.com    | Dr. Sarah Johnson  |
+| Carol Lee       | carol@dietsync.com  | Dr. Michael Chen   |
+| David Nguyen    | david@dietsync.com  | Dr. Michael Chen   |
 
 ## Security model
 

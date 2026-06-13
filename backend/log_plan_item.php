@@ -56,7 +56,7 @@ if ($action === 'take') {
 
     $now    = date('Y-m-d H:i:s');
     $unit   = $item['serving_unit'] ?? 'g';
-    $amount = $item['serving_amount'] !== null ? (float) $item['serving_amount'] : null;
+    $amount = (float) ($item['serving_amount'] ?? 0);
 
     $stmt = $conn->prepare(
         "INSERT INTO food_logs (user_id, food_id, entry_type, quantity_g, calories_consumed, serving_unit, serving_amount, plan_item_id, logged_at)

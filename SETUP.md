@@ -45,34 +45,29 @@ DietSync/
 Start MySQL/MariaDB first (in XAMPP: open the Control Panel and **Start** Apache
 and MySQL).
 
-### Option A — Fresh install (recommended)
-
-Loads the full schema (all tables) and seeds the default accounts + ~240 foods.
+There are **no migrations** — `schema.sql` is the single, complete database file.
+It **drops any existing `dietsync` database and recreates it from scratch**, then
+seeds the default accounts and ~240 foods:
 
 ```bash
 mysql -u root < database/schema.sql
 ```
 
-Optional richer demo data (extra dietitians/patients, plans, logs, feedback,
-water history, a few unverified foods):
+Optional demo data (four patients with plans, food/water logs, answered feedback,
+and a couple of foods pending review):
 
 ```bash
 mysql -u root dietsync < database/dummy_data.sql
 ```
 
-### Option B — Upgrading an existing DietSync database
-
-If you already have an older `dietsync` database, apply the migrations in order
-instead of re-running `schema.sql` (which would not touch existing tables):
-
-```bash
-mysql -u root dietsync < database/migration.sql      # original index pass
-mysql -u root dietsync < database/migration_v2.sql   # feature-upgrade columns + tables
-```
+> ⚠️ Re-running `schema.sql` **wipes** the `dietsync` database (that's how you get
+> a clean slate with no leftover tables). Don't run it against a database whose
+> data you want to keep.
 
 > No MySQL on your PATH? Use **phpMyAdmin** (bundled with XAMPP at
-> `http://localhost/phpmyadmin`): create a database named `dietsync`, then use the
-> **Import** tab to run each `.sql` file.
+> `http://localhost/phpmyadmin`) and use the **Import** tab to run `schema.sql`
+> (then `dummy_data.sql`). Because `schema.sql` creates the database itself, you
+> do not need to create `dietsync` first.
 
 ---
 
@@ -128,13 +123,17 @@ The app opens on the landing page; use **Login** or **Register**.
 | Dietitian | sarah@dietsync.com   |
 | Patient   | john@dietsync.com    |
 
-### Demo accounts (only if you loaded `dummy_data.sql`) — password: `password123`
+### Demo patients (only if you loaded `dummy_data.sql`) — password: `password123`
 
-| Role      | Email                | Notes                              |
-|-----------|----------------------|------------------------------------|
-| Dietitian | emma@dietsync.com    | has Alice & Bob assigned           |
-| Patient   | alice@dietsync.com   | plan + food/water logs + feedback  |
-| Patient   | bob@dietsync.com     | plan + food logs                   |
+All four are assigned to the seeded dietitians (Sarah or Michael) with a plan,
+food/water logs and feedback.
+
+| Patient            | Email               | Dietitian          |
+|--------------------|---------------------|--------------------|
+| Alice Thompson     | alice@dietsync.com  | Dr. Sarah Johnson  |
+| Bob Martinez       | bob@dietsync.com    | Dr. Sarah Johnson  |
+| Carol Lee          | carol@dietsync.com  | Dr. Michael Chen   |
+| David Nguyen       | david@dietsync.com  | Dr. Michael Chen   |
 
 Login takes **email + password only** — the role comes from the account.
 
@@ -168,9 +167,9 @@ Login takes **email + password only** — the role comes from the account.
   see it, make sure PHP and MySQL agree on the server time / zone.
 - **Foreign-key error importing `dummy_data.sql`** → load `schema.sql` first; the
   demo data references the seeded accounts and foods.
-- **`migration_v2.sql` errors on MySQL 8** → the file uses MariaDB
-  `ADD COLUMN IF NOT EXISTS` syntax; on MySQL 8 remove the `IF NOT EXISTS`
-  clauses (and skip anything that already exists).
+- **Leftover `water_logs` / `meal_completions` tables from an old setup** → just
+  re-run `database/schema.sql`; it drops and recreates the whole database, so the
+  obsolete tables disappear. (Back up first if you need the old data.)
 
 ---
 

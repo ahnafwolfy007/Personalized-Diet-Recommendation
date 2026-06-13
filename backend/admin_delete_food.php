@@ -14,7 +14,8 @@ if ($food_id <= 0) {
     json_response(['success' => false, 'message' => 'Invalid food.']);
 }
 
-$stmt = $conn->prepare("DELETE FROM foods WHERE food_id = ?");
+// Never delete the built-in "Drinking Water" food (water logs depend on it).
+$stmt = $conn->prepare("DELETE FROM foods WHERE food_id = ? AND name <> 'Drinking Water'");
 $stmt->bind_param('i', $food_id);
 $stmt->execute();
 $affected = $stmt->affected_rows;

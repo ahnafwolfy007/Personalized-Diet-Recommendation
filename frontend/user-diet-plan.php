@@ -38,26 +38,6 @@ include __DIR__ . '/partials/head.php';
         </div>
       </div>
 
-      <!-- Legacy free-text plan fallback -->
-      <div id="legacy-content" class="hidden">
-        <div class="card p-6 mb-6">
-          <h2 class="text-xl mb-2">Breakfast</h2>
-          <div class="note-box"><p id="lg-breakfast" class="text-gray text-relaxed" style="white-space:pre-wrap;"></p></div>
-        </div>
-        <div class="card p-6 mb-6">
-          <h2 class="text-xl mb-2">Lunch</h2>
-          <div class="note-box"><p id="lg-lunch" class="text-gray text-relaxed" style="white-space:pre-wrap;"></p></div>
-        </div>
-        <div class="card p-6 mb-6">
-          <h2 class="text-xl mb-2">Dinner</h2>
-          <div class="note-box"><p id="lg-dinner" class="text-gray text-relaxed" style="white-space:pre-wrap;"></p></div>
-        </div>
-        <div class="card p-6">
-          <h2 class="text-xl mb-2">Dietitian Notes</h2>
-          <div class="note-box"><p id="lg-notes" class="text-gray text-relaxed" style="white-space:pre-wrap;"></p></div>
-        </div>
-      </div>
-
     </div>
   </main>
 </div>
@@ -127,19 +107,12 @@ include __DIR__ . '/partials/head.php';
 
         if (data.items && data.items.length > 0) {
           renderMeals(data.items);
-          document.getElementById('plan-notes').textContent = plan.notes || 'No notes.';
-          document.getElementById('plan-content').classList.remove('hidden');
-        } else if (plan.breakfast_text || plan.lunch_text || plan.dinner_text) {
-          // Legacy text plan.
-          document.getElementById('lg-breakfast').textContent = plan.breakfast_text || 'Not specified.';
-          document.getElementById('lg-lunch').textContent     = plan.lunch_text     || 'Not specified.';
-          document.getElementById('lg-dinner').textContent    = plan.dinner_text    || 'Not specified.';
-          document.getElementById('lg-notes').textContent     = plan.notes          || 'No notes.';
-          document.getElementById('legacy-content').classList.remove('hidden');
         } else {
-          document.getElementById('plan-notes').textContent = plan.notes || 'No notes.';
-          document.getElementById('plan-content').classList.remove('hidden');
+          document.getElementById('meals').innerHTML =
+            '<div class="card p-6 mb-6 text-center text-gray">This plan has no meals yet.</div>';
         }
+        document.getElementById('plan-notes').textContent = plan.notes || 'No notes.';
+        document.getElementById('plan-content').classList.remove('hidden');
       })
       .catch(function () { window.location.href = 'login.php'; });
   }

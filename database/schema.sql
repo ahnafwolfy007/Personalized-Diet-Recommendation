@@ -1,16 +1,34 @@
 -- ============================================================
--- DietSync — Authoritative Database Schema
--- Single source of truth. Run this once on a fresh database.
--- (For an existing database, apply database/migration.sql instead.)
+-- DietSync — Complete Database (single source of truth)
+-- ============================================================
+-- Run this ONE file to (re)create the whole database from scratch. It DROPS any
+-- existing `dietsync` database first, so there are no migrations to track and no
+-- leftover tables. After this, optionally load database/dummy_data.sql for demo
+-- data.
+--
+--   mysql -u root < database/schema.sql
+--   mysql -u root dietsync < database/dummy_data.sql      (optional demo data)
+--
+-- Design notes:
+--   * food_logs is the single table for every patient entry: normal food, water
+--     (entry_type='water', referencing the built-in "Drinking Water" food), and
+--     "Taken" diet-plan ticks (plan_item_id > 0).
+--   * No nullable id columns are used for the common cases. The only intentionally
+--     nullable foreign keys are: users.assigned_dietitian_id (admins, dietitians
+--     and not-yet-assigned patients have none) and foods.created_by (built-in
+--     foods have no author) — both are correct "optional relationship" columns.
 -- ============================================================
 
-CREATE DATABASE IF NOT EXISTS dietsync CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+DROP DATABASE IF EXISTS dietsync;
+CREATE DATABASE dietsync CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE dietsync;
 
 -- ------------------------------------------------------------
 -- users : patients, dietitians and admins
+--   Health fields (age…activity_level) are for patients; professional fields
+--   (works_at…bio) are for dietitians. Unused fields stay NULL for a given role.
 -- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
     user_id               INT AUTO_INCREMENT PRIMARY KEY,
     name                  VARCHAR(100) NOT NULL,
     email                 VARCHAR(150) NOT NULL UNIQUE,
@@ -24,7 +42,6 @@ CREATE TABLE IF NOT EXISTS users (
     status                ENUM('active','inactive') NOT NULL DEFAULT 'active',
     created_at            DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     assigned_dietitian_id INT          DEFAULT NULL,
-    -- Dietitian-only professional details (NULL for patients/admins).
     works_at              VARCHAR(150) DEFAULT NULL,
     experience_years      INT          DEFAULT NULL,
     specialization        VARCHAR(150) DEFAULT NULL,
@@ -36,15 +53,14 @@ CREATE TABLE IF NOT EXISTS users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- foods : reference food items with calories per 100g
+-- foods : reference + user-contributed food items (calories per 100g)
+--   created_by is NULL for the built-in catalogue, set for user contributions.
 -- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS foods (
+CREATE TABLE foods (
     food_id           INT AUTO_INCREMENT PRIMARY KEY,
     name              VARCHAR(150) NOT NULL,
     calories_per_100g FLOAT        NOT NULL,
     category          VARCHAR(50)  NOT NULL DEFAULT 'General',
-    -- User contributions: created_by set when a user adds a food; is_verified=0
-    -- until an admin reviews it. Seeded reference foods are verified by default.
     created_by        INT          DEFAULT NULL,
     is_verified       TINYINT(1)   NOT NULL DEFAULT 1,
     created_at        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -56,24 +72,23 @@ CREATE TABLE IF NOT EXISTS foods (
 -- ------------------------------------------------------------
 -- food_logs : the single table for EVERY patient entry.
 --   entry_type   : 'food' (default) or 'water'
---   food_id      : the food (NULL for water rows)
+--   food_id      : the food; water entries reference the "Drinking Water" food
 --   quantity_g   : resolved grams calories derive from; for water, millilitres
---   serving_unit / serving_amount : the unit + amount the user picked
+--   serving_unit / serving_amount : the unit + amount picked
 --                  ('g'/'portion'/'glass'/'tbsp'/'tsp', or 'ml' for water)
---   plan_item_id : set when the row came from ticking a diet-plan item "Taken"
--- Composite (user_id, logged_at) index serves the daily range queries.
+--   plan_item_id : >0 when the row came from ticking a diet-plan item (0 = none)
 -- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS food_logs (
+CREATE TABLE food_logs (
     log_id            INT AUTO_INCREMENT PRIMARY KEY,
     user_id           INT   NOT NULL,
-    food_id           INT   NULL,
+    food_id           INT   NOT NULL,
     entry_type        ENUM('food','water') NOT NULL DEFAULT 'food',
     quantity_g        FLOAT NOT NULL,
     calories_consumed FLOAT NOT NULL,
     serving_unit      VARCHAR(20) NOT NULL DEFAULT 'g',
-    serving_amount    FLOAT       DEFAULT NULL,
-    plan_item_id      INT         DEFAULT NULL,
-    logged_at         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    serving_amount    FLOAT       NOT NULL DEFAULT 0,
+    plan_item_id      INT         NOT NULL DEFAULT 0,
+    logged_at         DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY idx_food_logs_user_logged (user_id, logged_at),
     KEY idx_food_logs_type (user_id, entry_type, logged_at),
     KEY idx_food_logs_food (food_id),
@@ -83,17 +98,15 @@ CREATE TABLE IF NOT EXISTS food_logs (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- diet_plans : dietitian-authored plans (one per patient/dietitian pair)
+-- diet_plans : one plan per (patient, dietitian) pair. Meals live in
+-- diet_plan_items; the dietitian also sets a daily water goal.
 -- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS diet_plans (
+CREATE TABLE diet_plans (
     plan_id        INT AUTO_INCREMENT PRIMARY KEY,
     patient_id     INT NOT NULL,
     dietitian_id   INT NOT NULL,
-    breakfast_text TEXT,
-    lunch_text     TEXT,
-    dinner_text    TEXT,
-    notes          TEXT,
-    water_goal_ml  INT  DEFAULT NULL,
+    notes          TEXT NOT NULL,
+    water_goal_ml  INT  NOT NULL DEFAULT 2000,
     created_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uniq_plan_patient_dietitian (patient_id, dietitian_id),
@@ -103,9 +116,28 @@ CREATE TABLE IF NOT EXISTS diet_plans (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
+-- diet_plan_items : food + amount rows of a plan. The dietitian picks an amount
+-- in the same units patients use (g/portion/glass/tbsp/tsp).
+-- ------------------------------------------------------------
+CREATE TABLE diet_plan_items (
+    item_id        INT AUTO_INCREMENT PRIMARY KEY,
+    plan_id        INT   NOT NULL,
+    meal           ENUM('breakfast','lunch','dinner') NOT NULL,
+    food_id        INT   NOT NULL,
+    quantity_g     FLOAT NOT NULL,
+    serving_unit   VARCHAR(20) NOT NULL DEFAULT 'g',
+    serving_amount FLOAT NOT NULL DEFAULT 0,
+    calories       FLOAT NOT NULL,
+    KEY idx_plan_items_plan_meal (plan_id, meal),
+    KEY idx_plan_items_food (food_id),
+    CONSTRAINT fk_plan_items_plan FOREIGN KEY (plan_id) REFERENCES diet_plans(plan_id) ON DELETE CASCADE,
+    CONSTRAINT fk_plan_items_food FOREIGN KEY (food_id) REFERENCES foods(food_id)     ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
 -- feedbacks : patient messages and dietitian responses
 -- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS feedbacks (
+CREATE TABLE feedbacks (
     feedback_id  INT AUTO_INCREMENT PRIMARY KEY,
     patient_id   INT NOT NULL,
     dietitian_id INT NOT NULL,
@@ -122,7 +154,7 @@ CREATE TABLE IF NOT EXISTS feedbacks (
 -- ------------------------------------------------------------
 -- dietitian_requests : patient -> dietitian assignment requests
 -- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS dietitian_requests (
+CREATE TABLE dietitian_requests (
     request_id   INT AUTO_INCREMENT PRIMARY KEY,
     patient_id   INT NOT NULL,
     dietitian_id INT NOT NULL,
@@ -135,33 +167,9 @@ CREATE TABLE IF NOT EXISTS dietitian_requests (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- diet_plan_items : database-driven meal plan rows (food + amount)
--- ------------------------------------------------------------
--- diet_plan_items : food + amount rows of a database-driven plan. The dietitian
--- picks an amount in the same units as the patient (g/portion/glass/tbsp/tsp);
--- quantity_g is the resolved grams and calories the computed total.
-CREATE TABLE IF NOT EXISTS diet_plan_items (
-    item_id        INT AUTO_INCREMENT PRIMARY KEY,
-    plan_id        INT   NOT NULL,
-    meal           ENUM('breakfast','lunch','dinner') NOT NULL,
-    food_id        INT   NOT NULL,
-    quantity_g     FLOAT NOT NULL,
-    serving_unit   VARCHAR(20) NOT NULL DEFAULT 'g',
-    serving_amount FLOAT NULL,
-    calories       FLOAT NOT NULL,
-    KEY idx_plan_items_plan_meal (plan_id, meal),
-    KEY idx_plan_items_food (food_id),
-    CONSTRAINT fk_plan_items_plan FOREIGN KEY (plan_id) REFERENCES diet_plans(plan_id) ON DELETE CASCADE,
-    CONSTRAINT fk_plan_items_food FOREIGN KEY (food_id) REFERENCES foods(food_id)     ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Note: water intake and "Taken" plan-item ticks are stored in food_logs
--- (entry_type='water' and plan_item_id respectively) — no separate tables.
-
--- ------------------------------------------------------------
 -- assignment_removals : rationale recorded when a patient/dietitian unassigns
 -- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS assignment_removals (
+CREATE TABLE assignment_removals (
     removal_id      INT AUTO_INCREMENT PRIMARY KEY,
     patient_id      INT  NOT NULL,
     dietitian_id    INT  NOT NULL,
@@ -177,16 +185,15 @@ CREATE TABLE IF NOT EXISTS assignment_removals (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- activity_log : admin Activity Monitor feed.
--- Records meaningful actions (login, requests, plans, feedback, food add/verify,
--- unassign). Individual food/water log entries are intentionally NOT recorded.
+-- activity_log : admin Activity Monitor feed (food/water entries NOT recorded).
+--   user_id is nullable only so a row survives (SET NULL) if its user is deleted.
 -- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS activity_log (
+CREATE TABLE activity_log (
     activity_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id     INT          NULL,
+    user_id     INT          DEFAULT NULL,
     actor_role  VARCHAR(20)  NOT NULL DEFAULT '',
     action      VARCHAR(60)  NOT NULL,
-    detail      VARCHAR(255) NULL,
+    detail      VARCHAR(255) NOT NULL DEFAULT '',
     created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY idx_activity_created (created_at),
     KEY idx_activity_user (user_id),
@@ -195,17 +202,22 @@ CREATE TABLE IF NOT EXISTS activity_log (
 
 -- ============================================================
 -- SEED: default accounts (all default passwords = "password")
+--   user_id 1 = Admin, 2 = Dr. Sarah Johnson, 3 = Dr. Michael Chen, 4 = John Doe
 -- ============================================================
-INSERT INTO users (name, email, password, role, status, works_at, experience_years, specialization, bio) VALUES
-('Admin',             'admin@dietsync.com',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin',     'active', NULL, NULL, NULL, NULL),
-('Dr. Sarah Johnson', 'sarah@dietsync.com',   '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'dietitian', 'active', 'City Health Clinic', 8,  'Weight management & sports nutrition', 'Registered dietitian focused on sustainable, evidence-based eating habits.'),
-('Dr. Michael Chen',  'michael@dietsync.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'dietitian', 'active', 'Wellness Partners',  12, 'Clinical & diabetic nutrition',        'Clinical dietitian helping patients manage chronic conditions through diet.');
-
-INSERT INTO users (name, email, password, role, status, age, gender, height_cm, weight_kg, activity_level) VALUES
-('John Doe', 'john@dietsync.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'patient', 'active', 28, 'Male', 175, 70, 'Moderately Active (3-5 days/week)');
+INSERT INTO users
+  (name, email, password, role, status, age, gender, height_cm, weight_kg, activity_level, assigned_dietitian_id, works_at, experience_years, specialization, bio)
+VALUES
+('Admin', 'admin@dietsync.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'active',
+  40, 'Other', 170, 72, 'Lightly Active (1-3 days/week)', NULL, 'DietSync HQ', 10, 'Platform administration', 'Maintains the DietSync platform and user base.'),
+('Dr. Sarah Johnson', 'sarah@dietsync.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'dietitian', 'active',
+  36, 'Female', 168, 63, 'Moderately Active (3-5 days/week)', NULL, 'City Health Clinic', 8, 'Weight management & sports nutrition', 'Registered dietitian focused on sustainable, evidence-based eating habits.'),
+('Dr. Michael Chen', 'michael@dietsync.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'dietitian', 'active',
+  44, 'Male', 178, 80, 'Lightly Active (1-3 days/week)', NULL, 'Wellness Partners', 12, 'Clinical & diabetic nutrition', 'Clinical dietitian helping patients manage chronic conditions through diet.'),
+('John Doe', 'john@dietsync.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'patient', 'active',
+  28, 'Male', 175, 70, 'Moderately Active (3-5 days/week)', 2, 'Brightline Studios', 5, 'Software engineering', 'Trying to build healthier eating habits and stay consistent.');
 
 -- ============================================================
--- SEED: foods
+-- SEED: foods (built-in catalogue; created_by stays NULL = system food)
 -- ============================================================
 INSERT INTO foods (name, calories_per_100g, category) VALUES
 -- GRAINS & CEREALS
@@ -234,7 +246,6 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('Millet (cooked)',              119,  'Grain'),
 ('Couscous (cooked)',            112,  'Grain'),
 ('Tortilla (flour)',             312,  'Grain'),
-
 -- PROTEINS – MEAT
 ('Chicken Breast (cooked)',      165,  'Protein'),
 ('Chicken Thigh (cooked)',       209,  'Protein'),
@@ -251,7 +262,6 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('Bacon (cooked)',               541,  'Protein'),
 ('Ham (cured)',                  145,  'Protein'),
 ('Salami',                       336,  'Protein'),
-
 -- PROTEINS – SEAFOOD
 ('Salmon (cooked)',              208,  'Protein'),
 ('Tuna (canned in water)',       109,  'Protein'),
@@ -268,7 +278,6 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('Prawn (cooked)',               99,   'Protein'),
 ('Squid (cooked)',               175,  'Protein'),
 ('Mussels (cooked)',             172,  'Protein'),
-
 -- EGGS & DAIRY
 ('Egg (boiled)',                 155,  'Protein'),
 ('Egg (fried)',                  196,  'Protein'),
@@ -290,7 +299,6 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('Whipping Cream',               345,  'Dairy'),
 ('Ice Cream (vanilla)',          207,  'Dairy'),
 ('Sour Cream',                   198,  'Dairy'),
-
 -- FRUITS
 ('Apple',                        52,   'Fruit'),
 ('Banana',                       89,   'Fruit'),
@@ -322,7 +330,6 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('Grapefruit',                   42,   'Fruit'),
 ('Passion Fruit',                97,   'Fruit'),
 ('Jackfruit',                    95,   'Fruit'),
-
 -- VEGETABLES
 ('Broccoli',                     34,   'Vegetable'),
 ('Carrot',                       41,   'Vegetable'),
@@ -358,7 +365,6 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('Bitter Gourd',                 17,   'Vegetable'),
 ('Okra',                         33,   'Vegetable'),
 ('Chili Pepper (red)',           40,   'Vegetable'),
-
 -- LEGUMES & BEANS
 ('Lentils (cooked)',             116,  'Legume'),
 ('Chickpeas (cooked)',           164,  'Legume'),
@@ -370,7 +376,6 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('Edamame',                      121,  'Legume'),
 ('Split Peas (cooked)',          118,  'Legume'),
 ('Navy Beans (cooked)',         130,  'Legume'),
-
 -- NUTS & SEEDS
 ('Almonds',                      579,  'Nut'),
 ('Peanuts',                      567,  'Nut'),
@@ -386,7 +391,6 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('Sesame Seeds',                 573,  'Nut'),
 ('Peanut Butter',                588,  'Nut'),
 ('Almond Butter',                614,  'Nut'),
-
 -- OILS & FATS
 ('Olive Oil',                    884,  'Oil'),
 ('Coconut Oil',                  892,  'Oil'),
@@ -394,17 +398,15 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('Canola Oil',                   884,  'Oil'),
 ('Ghee',                         876,  'Oil'),
 ('Margarine',                    719,  'Oil'),
-
 -- BEVERAGES
 ('Orange Juice',                 45,   'Beverage'),
 ('Apple Juice',                  46,   'Beverage'),
 ('Mango Juice',                  60,   'Beverage'),
 ('Coconut Water',                19,   'Beverage'),
-('Green Tea (unsweetened)',       1,    'Beverage'),
-('Black Coffee',                  2,    'Beverage'),
+('Green Tea (unsweetened)',       1,   'Beverage'),
+('Black Coffee',                  2,   'Beverage'),
 ('Whole Milk Latte',             67,   'Beverage'),
 ('Protein Shake (mixed)',        88,   'Beverage'),
-
 -- SWEETS & SNACKS
 ('Dark Chocolate (70%)',         598,  'Sweet'),
 ('Milk Chocolate',               535,  'Sweet'),
@@ -426,7 +428,6 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('French Fries',                 312,  'Prepared'),
 ('Burger (beef patty only)',     295,  'Prepared'),
 ('Hot Chocolate',                71,   'Beverage'),
-
 -- PREPARED / MIXED DISHES
 ('Omelette (2 eggs)',            154,  'Prepared'),
 ('Vegetable Soup',               50,   'Prepared'),
@@ -443,14 +444,12 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('Tzatziki',                     54,   'Prepared'),
 ('Sushi Rice (per 100g)',        130,  'Prepared'),
 ('Miso Soup',                    40,   'Prepared'),
-
 -- FISH & SEAFOOD (additional)
 ('Fish Fingers (fried)',         225,  'Protein'),
 ('Fish Cake',                    175,  'Protein'),
 ('Smoked Salmon',                179,  'Protein'),
 ('Anchovies (canned)',           210,  'Protein'),
 ('Oysters (raw)',                69,   'Protein'),
-
 -- ADDITIONAL GRAINS
 ('Bagel',                        245,  'Grain'),
 ('Crumpet',                      198,  'Grain'),
@@ -458,7 +457,6 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('Rice Noodles (cooked)',        109,  'Grain'),
 ('Egg Noodles (cooked)',         138,  'Grain'),
 ('Udon Noodles (cooked)',        124,  'Grain'),
-
 -- MORE DAIRY
 ('Kefir',                        52,   'Dairy'),
 ('Brie Cheese',                  334,  'Dairy'),
@@ -466,7 +464,6 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('Ricotta Cheese',               174,  'Dairy'),
 ('Condensed Milk',               321,  'Dairy'),
 ('Evaporated Milk',              135,  'Dairy'),
-
 -- CONDIMENTS
 ('Ketchup',                      112,  'Condiment'),
 ('Mustard',                      66,   'Condiment'),
@@ -477,4 +474,7 @@ INSERT INTO foods (name, calories_per_100g, category) VALUES
 ('Worcestershire Sauce',        78,   'Condiment'),
 ('Barbecue Sauce',               172,  'Condiment'),
 ('Ranch Dressing',               145,  'Condiment'),
-('Olive Tapenade',               168,  'Condiment');
+('Olive Tapenade',               168,  'Condiment'),
+-- Built-in 0-calorie "food" that water-intake entries reference (kept out of the
+-- food picker by the app). Do not remove.
+('Drinking Water',               0,    'Beverage');

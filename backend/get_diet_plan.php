@@ -20,8 +20,7 @@ $stmt->close();
 
 if ($assigned > 0) {
     $stmt = $conn->prepare("
-        SELECT dp.plan_id, dp.breakfast_text, dp.lunch_text, dp.dinner_text, dp.notes,
-               dp.created_at, u.name AS dietitian_name
+        SELECT dp.plan_id, dp.notes, dp.created_at, u.name AS dietitian_name
         FROM diet_plans dp
         JOIN users u ON dp.dietitian_id = u.user_id
         WHERE dp.patient_id = ? AND dp.dietitian_id = ?
@@ -30,8 +29,7 @@ if ($assigned > 0) {
     $stmt->bind_param('ii', $patient_id, $assigned);
 } else {
     $stmt = $conn->prepare("
-        SELECT dp.plan_id, dp.breakfast_text, dp.lunch_text, dp.dinner_text, dp.notes,
-               dp.created_at, u.name AS dietitian_name
+        SELECT dp.plan_id, dp.notes, dp.created_at, u.name AS dietitian_name
         FROM diet_plans dp
         JOIN users u ON dp.dietitian_id = u.user_id
         WHERE dp.patient_id = ?
