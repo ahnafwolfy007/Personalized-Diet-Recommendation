@@ -76,6 +76,36 @@ if (!function_exists('serving_units')) {
     }
 }
 
+if (!function_exists('pagination_args')) {
+    /**
+     * Read pagination inputs from the request (GET) and return
+     * [page, perPage, offset] with sane clamping. Used by list endpoints to
+     * serve one page at a time (LIMIT/OFFSET) instead of every row.
+     */
+    function pagination_args(int $default = 20, int $max = 100): array
+    {
+        $page    = max(1, (int) ($_GET['page'] ?? 1));
+        $perPage = (int) ($_GET['per_page'] ?? $default);
+        if ($perPage < 1)   $perPage = $default;
+        if ($perPage > $max) $perPage = $max;
+        return [$page, $perPage, ($page - 1) * $perPage];
+    }
+}
+
+if (!function_exists('pagination_meta')) {
+    /** Build the pagination metadata block returned alongside a page of rows. */
+    function pagination_meta(int $total, int $page, int $perPage): array
+    {
+        $totalPages = $perPage > 0 ? (int) ceil($total / $perPage) : 1;
+        return [
+            'page'        => $page,
+            'per_page'    => $perPage,
+            'total'       => $total,
+            'total_pages' => max(1, $totalPages),
+        ];
+    }
+}
+
 if (!function_exists('food_categories')) {
     /** The fixed set of food categories offered in the add/edit-food dropdowns. */
     function food_categories(): array

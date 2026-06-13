@@ -2,8 +2,9 @@
 // backend/dietitian_get_analytics.php
 // Per-patient analytics for the logged-in dietitian's assigned patients:
 // today's intake vs need, 7-day average intake, plan adherence (meals ticked
-// over the last 7 days), today's water, and last-active time. All metrics come
-// from a fixed set of aggregated queries (no per-patient N+1 lookups).
+// over the last 7 days), today's water, and last-active time. The patient list
+// is paginated; the aggregate queries are then constrained to that page's
+// patient ids (one query each — no per-patient N+1).
 
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/helpers.php';
@@ -11,17 +12,20 @@ require_once __DIR__ . '/helpers.php';
 $dietitian_id = require_role('dietitian');
 
 [$tStart, $tEnd] = day_bounds(date('Y-m-d'));
-$weekStart  = date('Y-m-d 00:00:00', strtotime('-6 days'));
-$weekStartD = date('Y-m-d', strtotime('-6 days'));
+$weekStart = date('Y-m-d 00:00:00', strtotime('-6 days'));
+[$page, $perPage, $offset] = pagination_args(10);
 
-// 1) Base list of assigned patients + metrics.
+$total = (int) $conn->query("SELECT COUNT(*) AS c FROM users WHERE assigned_dietitian_id = " . (int) $dietitian_id . " AND role = 'patient'")->fetch_assoc()['c'];
+
+// 1) Base list: this page of assigned patients + metrics.
 $stmt = $conn->prepare("
     SELECT user_id, name, age, gender, height_cm, weight_kg, activity_level
     FROM users
     WHERE assigned_dietitian_id = ? AND role = 'patient'
     ORDER BY name ASC
+    LIMIT ? OFFSET ?
 ");
-$stmt->bind_param('i', $dietitian_id);
+$stmt->bind_param('iii', $dietitian_id, $perPage, $offset);
 $stmt->execute();
 $res = $stmt->get_result();
 $patients = [];
@@ -40,18 +44,20 @@ while ($u = $res->fetch_assoc()) {
 $stmt->close();
 
 if (!empty($patients)) {
-    // 2) Food intake: today, 7-day total, last active (single grouped query).
+    // Safe integer id list (values come straight from the DB).
+    $idList = implode(',', array_keys($patients));
+
+    // 2) Food intake: today, 7-day total, last active.
     $stmt = $conn->prepare("
-        SELECT u.user_id,
-               COALESCE(SUM(CASE WHEN fl.logged_at >= ? AND fl.logged_at < ? THEN fl.calories_consumed END), 0) AS today_intake,
-               COALESCE(SUM(CASE WHEN fl.logged_at >= ? THEN fl.calories_consumed END), 0) AS week_total,
-               MAX(fl.logged_at) AS last_active
-        FROM users u
-        LEFT JOIN food_logs fl ON fl.user_id = u.user_id
-        WHERE u.assigned_dietitian_id = ? AND u.role = 'patient'
-        GROUP BY u.user_id
+        SELECT user_id,
+               COALESCE(SUM(CASE WHEN logged_at >= ? AND logged_at < ? THEN calories_consumed END), 0) AS today_intake,
+               COALESCE(SUM(CASE WHEN logged_at >= ? THEN calories_consumed END), 0) AS week_total,
+               MAX(logged_at) AS last_active
+        FROM food_logs
+        WHERE user_id IN ($idList)
+        GROUP BY user_id
     ");
-    $stmt->bind_param('sssi', $tStart, $tEnd, $weekStart, $dietitian_id);
+    $stmt->bind_param('sss', $tStart, $tEnd, $weekStart);
     $stmt->execute();
     $res = $stmt->get_result();
     while ($row = $res->fetch_assoc()) {
@@ -65,14 +71,13 @@ if (!empty($patients)) {
 
     // 3) Water today.
     $stmt = $conn->prepare("
-        SELECT u.user_id,
-               COALESCE(SUM(CASE WHEN w.entry_type = 'water' AND w.logged_at >= ? AND w.logged_at < ? THEN w.quantity_g END), 0) AS water_today
-        FROM users u
-        LEFT JOIN food_logs w ON w.user_id = u.user_id
-        WHERE u.assigned_dietitian_id = ? AND u.role = 'patient'
-        GROUP BY u.user_id
+        SELECT user_id,
+               COALESCE(SUM(CASE WHEN entry_type = 'water' AND logged_at >= ? AND logged_at < ? THEN quantity_g END), 0) AS water_today
+        FROM food_logs
+        WHERE user_id IN ($idList)
+        GROUP BY user_id
     ");
-    $stmt->bind_param('ssi', $tStart, $tEnd, $dietitian_id);
+    $stmt->bind_param('ss', $tStart, $tEnd);
     $stmt->execute();
     $res = $stmt->get_result();
     while ($row = $res->fetch_assoc()) {
@@ -83,30 +88,24 @@ if (!empty($patients)) {
 
     // 4) Plan item counts (denominator for adherence).
     $itemCounts = [];
-    $stmt = $conn->prepare("
+    $res = $conn->query("
         SELECT dp.patient_id, COUNT(i.item_id) AS items
         FROM diet_plans dp
         JOIN diet_plan_items i ON i.plan_id = dp.plan_id
-        WHERE dp.dietitian_id = ?
+        WHERE dp.patient_id IN ($idList)
         GROUP BY dp.patient_id
     ");
-    $stmt->bind_param('i', $dietitian_id);
-    $stmt->execute();
-    $res = $stmt->get_result();
     while ($row = $res->fetch_assoc()) { $itemCounts[(int) $row['patient_id']] = (int) $row['items']; }
-    $stmt->close();
 
     // 5) "Taken" plan-item logs over the last 7 days (numerator for adherence).
-    //    These are food_logs rows that carry a plan_item_id.
     $doneCounts = [];
     $stmt = $conn->prepare("
-        SELECT fl.user_id AS patient_id, COUNT(*) AS done
-        FROM food_logs fl
-        JOIN users u ON u.user_id = fl.user_id
-        WHERE u.assigned_dietitian_id = ? AND fl.plan_item_id IS NOT NULL AND fl.logged_at >= ?
-        GROUP BY fl.user_id
+        SELECT user_id AS patient_id, COUNT(*) AS done
+        FROM food_logs
+        WHERE user_id IN ($idList) AND plan_item_id IS NOT NULL AND logged_at >= ?
+        GROUP BY user_id
     ");
-    $stmt->bind_param('is', $dietitian_id, $weekStart);
+    $stmt->bind_param('s', $weekStart);
     $stmt->execute();
     $res = $stmt->get_result();
     while ($row = $res->fetch_assoc()) { $doneCounts[(int) $row['patient_id']] = (int) $row['done']; }
@@ -122,4 +121,8 @@ if (!empty($patients)) {
     unset($p);
 }
 
-json_response(['success' => true, 'patients' => array_values($patients)]);
+json_response([
+    'success'    => true,
+    'patients'   => array_values($patients),
+    'pagination' => pagination_meta($total, $page, $perPage),
+]);

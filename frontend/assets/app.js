@@ -68,6 +68,51 @@
     }, 3500);
   };
 
+  // Reusable numbered pagination control. Renders into `container` from a
+  // pagination meta object ({page, total_pages, total, per_page}) and calls
+  // onPage(n) when a page is chosen. Shows first/last with ellipses around the
+  // current page. Hidden automatically when there's a single page.
+  window.renderPagination = function (container, meta, onPage) {
+    if (!container) return;
+    var page = meta.page || 1;
+    var total = meta.total_pages || 1;
+
+    if (total <= 1) { container.innerHTML = ''; return; }
+
+    // Build a compact window of page numbers: 1 … p-1 p p+1 … N
+    var nums = [];
+    var push = function (n) { if (nums.indexOf(n) === -1 && n >= 1 && n <= total) nums.push(n); };
+    push(1);
+    for (var i = page - 1; i <= page + 1; i++) push(i);
+    push(total);
+    nums.sort(function (a, b) { return a - b; });
+
+    var html = '<button class="page-btn page-nav" data-page="' + (page - 1) + '"' +
+               (page <= 1 ? ' disabled' : '') + ' aria-label="Previous page">‹</button>';
+    var prev = 0;
+    nums.forEach(function (n) {
+      if (prev && n - prev > 1) html += '<span class="page-gap">…</span>';
+      html += '<button class="page-btn' + (n === page ? ' active' : '') + '" data-page="' + n + '"' +
+              (n === page ? ' aria-current="page"' : '') + '>' + n + '</button>';
+      prev = n;
+    });
+    html += '<button class="page-btn page-nav" data-page="' + (page + 1) + '"' +
+            (page >= total ? ' disabled' : '') + ' aria-label="Next page">›</button>';
+
+    var info = meta.total != null
+      ? '<span class="page-info">Page ' + page + ' of ' + total + ' · ' + meta.total + ' total</span>'
+      : '';
+    container.innerHTML = '<div class="pagination">' + html + '</div>' + info;
+
+    container.querySelectorAll('.page-btn').forEach(function (btn) {
+      if (btn.disabled) return;
+      btn.addEventListener('click', function () {
+        var n = parseInt(btn.getAttribute('data-page'), 10);
+        if (n >= 1 && n <= total && n !== page && typeof onPage === 'function') onPage(n);
+      });
+    });
+  };
+
   // Reusable "give a reason" modal. Resolves through onConfirm(reason, done),
   // where calling done() closes the modal. Used for unassignment rationale.
   window.showReasonModal = function (opts) {

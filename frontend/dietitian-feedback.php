@@ -19,6 +19,7 @@ include __DIR__ . '/partials/head.php';
       <div id="feedback-list">
         <p class="text-center text-gray">Loading feedback…</p>
       </div>
+      <div class="mt-6" id="feedback-pagination"></div>
 
     </div>
   </main>
@@ -26,12 +27,16 @@ include __DIR__ . '/partials/head.php';
 </div>
 
 <script>
-  function loadFeedback() {
-    fetch('../backend/dietitian_get_feedback.php')
+  var feedbackPage = 1;
+
+  function loadFeedback(page) {
+    feedbackPage = page || 1;
+    fetch('../backend/dietitian_get_feedback.php?page=' + feedbackPage)
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (!data.success) { window.location.href = 'login.php'; return; }
         var container = document.getElementById('feedback-list');
+        renderPagination(document.getElementById('feedback-pagination'), data.pagination, loadFeedback);
 
         if (data.feedbacks.length === 0) {
           container.innerHTML = '<div class="card p-8 text-center text-gray"><p>No feedback messages yet.</p></div>';
@@ -96,12 +101,12 @@ include __DIR__ . '/partials/head.php';
       .then(function(r) { return r.json(); })
       .then(function(data) {
         showToast(data.message, data.success ? 'success' : 'error');
-        if (data.success) loadFeedback();
+        if (data.success) loadFeedback(feedbackPage);
       })
       .catch(function() { showToast('Network error. Please try again.', 'error'); });
   }
 
-  loadFeedback();
+  loadFeedback(1);
 </script>
 </body>
 </html>

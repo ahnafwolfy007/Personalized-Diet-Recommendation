@@ -2,6 +2,34 @@
 
 All notable changes to DietSync are documented here.
 
+## [Pagination] – 2026-06-14
+
+Server-side pagination for every growable list, so pages fetch one slice of rows
+instead of the whole table — fewer/cheaper queries and faster responses.
+
+- **Reusable pattern.** `pagination_args()` / `pagination_meta()` helpers
+  (`backend/helpers.php`) drive `LIMIT/OFFSET` queries that return a
+  `pagination` block (`page`, `per_page`, `total`, `total_pages`). A shared
+  `renderPagination()` control (`assets/app.js`, styled in `base.css`) renders
+  numbered pages with first/last + ellipses and calls back on page change.
+- **Paginated tables:** admin Users, admin Foods, admin Activity Monitor,
+  dietitian Dashboard (pending requests *and* assigned patients), Patient
+  Analytics, both Feedback threads, and the patient Meal Log.
+- **Server-side search** replaces the old client-side filters on the admin Users
+  and Foods tables (debounced `?q=`), so search now spans the whole table rather
+  than the current page.
+- **Efficient aggregates.** The dietitian dashboard pages the patient list in a
+  subquery before joining today's logs, and Patient Analytics constrains its
+  aggregate queries to the current page's patient ids — still one query each,
+  no per-patient N+1.
+- **Correct day totals.** The Meal Log's summary cards (entries, calories,
+  largest item) now come from a whole-day backend summary, independent of the
+  page being viewed.
+- The food picker on Log Food intentionally still loads its list in full (it
+  powers the instant type-ahead search), and inherently single-day/bounded views
+  (dashboard "recent", water entries, daily report) are not paged.
+- Added detailed `SETUP.md` with end-to-end run instructions.
+
 ## [Refinements] – 2026-06-14
 
 Follow-up corrections and consolidation on top of the feature upgrade.

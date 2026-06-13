@@ -25,19 +25,13 @@ include __DIR__ . '/partials/head.php';
             <tbody id="activity-table"><tr><td colspan="5" class="text-center text-gray">Loading…</td></tr></tbody>
           </table>
         </div>
-        <div class="p-4 border-t flex items-center justify-between">
-          <button id="prev-btn" class="btn btn-secondary btn-sm" disabled>← Newer</button>
-          <span id="page-label" class="text-sm text-gray">Page 1</span>
-          <button id="next-btn" class="btn btn-secondary btn-sm" disabled>Older →</button>
-        </div>
+        <div class="table-footer" id="activity-pagination"></div>
       </div>
     </div>
   </main>
 </div>
 
 <script>
-  var page = 1, hasMore = false;
-
   var ACTION_LABELS = {
     login: 'Logged in', register: 'Registered',
     send_request: 'Sent request', accept_request: 'Accepted patient', reject_request: 'Rejected request',
@@ -57,29 +51,26 @@ include __DIR__ . '/partials/head.php';
     return '<span class="badge ' + cls + '">' + escapeHtml(label) + '</span>';
   }
 
-  function load() {
-    fetch('../backend/admin_get_activity.php?page=' + page)
+  function load(page) {
+    fetch('../backend/admin_get_activity.php?page=' + (page || 1))
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (!data.success) { window.location.href = 'login.php'; return; }
-        hasMore = data.has_more;
+        renderPagination(document.getElementById('activity-pagination'), data.pagination, load);
         var tbody = document.getElementById('activity-table');
         if (data.activity.length === 0) {
           tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray">No activity recorded yet.</td></tr>';
-        } else {
-          tbody.innerHTML = data.activity.map(function (a) {
-            return '<tr>' +
-              '<td class="text-gray">' + escapeHtml(a.created_at) + '</td>' +
-              '<td>' + escapeHtml(a.actor_name) + '</td>' +
-              '<td class="text-gray">' + escapeHtml(a.actor_role) + '</td>' +
-              '<td>' + actionBadge(a.action) + '</td>' +
-              '<td class="text-gray">' + escapeHtml(a.detail || '—') + '</td>' +
-              '</tr>';
-          }).join('');
+          return;
         }
-        document.getElementById('page-label').textContent = 'Page ' + page;
-        document.getElementById('prev-btn').disabled = page <= 1;
-        document.getElementById('next-btn').disabled = !hasMore;
+        tbody.innerHTML = data.activity.map(function (a) {
+          return '<tr>' +
+            '<td class="text-gray">' + escapeHtml(a.created_at) + '</td>' +
+            '<td>' + escapeHtml(a.actor_name) + '</td>' +
+            '<td class="text-gray">' + escapeHtml(a.actor_role) + '</td>' +
+            '<td>' + actionBadge(a.action) + '</td>' +
+            '<td class="text-gray">' + escapeHtml(a.detail || '—') + '</td>' +
+            '</tr>';
+        }).join('');
       })
       .catch(function () {
         document.getElementById('activity-table').innerHTML =
@@ -87,10 +78,7 @@ include __DIR__ . '/partials/head.php';
       });
   }
 
-  document.getElementById('prev-btn').addEventListener('click', function () { if (page > 1) { page--; load(); } });
-  document.getElementById('next-btn').addEventListener('click', function () { if (hasMore) { page++; load(); } });
-
-  load();
+  load(1);
 </script>
 </body>
 </html>

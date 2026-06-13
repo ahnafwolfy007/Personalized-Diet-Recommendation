@@ -42,6 +42,7 @@ include __DIR__ . '/partials/head.php';
       <div id="feedback-list">
         <p class="text-center text-gray">Loading…</p>
       </div>
+      <div class="mt-6" id="feedback-pagination"></div>
 
     </div>
   </main>
@@ -49,18 +50,23 @@ include __DIR__ . '/partials/head.php';
 </div>
 
 <script>
-  function loadFeedback() {
-    fetch('../backend/patient_get_feedback.php')
+  var feedbackPage = 1;
+
+  function loadFeedback(page) {
+    feedbackPage = page || 1;
+    fetch('../backend/patient_get_feedback.php?page=' + feedbackPage)
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (!data.success) { window.location.href = 'login.php'; return; }
 
         var list = document.getElementById('feedback-list');
+        renderPagination(document.getElementById('feedback-pagination'), data.pagination, loadFeedback);
 
         if (!data.has_dietitian) {
           document.getElementById('no-dietitian').classList.remove('hidden');
           document.getElementById('compose').classList.add('hidden');
           list.innerHTML = '';
+          document.getElementById('feedback-pagination').innerHTML = '';
           return;
         }
 
@@ -120,7 +126,7 @@ include __DIR__ . '/partials/head.php';
         btn.disabled = false;
         if (data.success) {
           field.value = '';
-          loadFeedback();
+          loadFeedback(1); // newest message is on page 1
         }
       })
       .catch(function() {
@@ -129,7 +135,7 @@ include __DIR__ . '/partials/head.php';
       });
   });
 
-  loadFeedback();
+  loadFeedback(1);
 </script>
 </body>
 </html>

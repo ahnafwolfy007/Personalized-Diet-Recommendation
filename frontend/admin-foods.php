@@ -77,6 +77,7 @@ include __DIR__ . '/partials/head.php';
             <tbody id="foods-table"><tr><td colspan="6" class="text-center text-gray">Loading…</td></tr></tbody>
           </table>
         </div>
+        <div class="table-footer" id="foods-pagination"></div>
       </div>
     </div>
   </main>
@@ -120,12 +121,8 @@ include __DIR__ . '/partials/head.php';
   }
 
   function render() {
-    var q = document.getElementById('food-filter').value.trim().toLowerCase();
-    var list = q === '' ? allFoods : allFoods.filter(function (f) {
-      return f.name.toLowerCase().indexOf(q) !== -1 || f.category.toLowerCase().indexOf(q) !== -1;
-    });
-    if (list.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray">No foods found.</td></tr>'; return; }
-    tbody.innerHTML = list.map(function (f) {
+    if (allFoods.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray">No foods found.</td></tr>'; return; }
+    tbody.innerHTML = allFoods.map(function (f) {
       var verifyBtn = Number(f.is_verified) === 0
         ? '<button class="btn btn-primary btn-sm js-verify" data-id="' + Number(f.food_id) + '">Verify</button>' : '';
       return '<tr' + (Number(f.is_verified) === 0 ? ' style="background:#fffbeb;"' : '') + '>' +
@@ -144,8 +141,13 @@ include __DIR__ . '/partials/head.php';
     }).join('');
   }
 
-  function load() {
-    fetch('../backend/admin_get_foods.php')
+  var currentPage = 1;
+  var searchQuery = '';
+
+  function load(page) {
+    currentPage = page || 1;
+    var url = '../backend/admin_get_foods.php?page=' + currentPage + '&q=' + encodeURIComponent(searchQuery);
+    fetch(url)
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (!data.success) { window.location.href = 'login.php'; return; }
@@ -154,11 +156,17 @@ include __DIR__ . '/partials/head.php';
         if (data.pending > 0) { pill.textContent = data.pending + ' pending review'; pill.classList.remove('hidden'); }
         else { pill.classList.add('hidden'); }
         render();
+        renderPagination(document.getElementById('foods-pagination'), data.pagination, load);
       })
       .catch(function () { tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray">Could not load foods.</td></tr>'; });
   }
 
-  document.getElementById('food-filter').addEventListener('input', render);
+  var foodSearchTimer;
+  document.getElementById('food-filter').addEventListener('input', function () {
+    searchQuery = this.value.trim();
+    clearTimeout(foodSearchTimer);
+    foodSearchTimer = setTimeout(function () { load(1); }, 300);
+  });
 
   function findFood(id) { return allFoods.filter(function (f) { return Number(f.food_id) === Number(id); })[0]; }
 
@@ -170,7 +178,7 @@ include __DIR__ . '/partials/head.php';
       .then(function (r) { return r.json(); })
       .then(function (data) {
         showToast(data.message, data.success ? 'success' : 'error');
-        if (data.success) { load(); if (onDone) onDone(); }
+        if (data.success) { load(currentPage); if (onDone) onDone(); }
       })
       .catch(function () { showToast('Network error. Please try again.', 'error'); });
   }
@@ -198,7 +206,7 @@ include __DIR__ . '/partials/head.php';
       var fd = new FormData(); fd.append('food_id', id);
       fetch('../backend/admin_delete_food.php', { method: 'POST', body: fd })
         .then(function (r) { return r.json(); })
-        .then(function (data) { showToast(data.message, data.success ? 'success' : 'error'); if (data.success) load(); })
+        .then(function (data) { showToast(data.message, data.success ? 'success' : 'error'); if (data.success) load(currentPage); })
         .catch(function () { showToast('Network error. Please try again.', 'error'); });
     }
   });
@@ -251,13 +259,13 @@ include __DIR__ . '/partials/head.php';
           document.getElementById('af-cals').value = '';
           document.getElementById('af-amount').value = '100';
           document.getElementById('add-panel').classList.add('hidden');
-          load();
+          load(1);
         }
       })
       .catch(function () { btn.disabled = false; showToast('Network error. Please try again.', 'error'); });
   });
 
-  load();
+  load(1);
 </script>
 </body>
 </html>

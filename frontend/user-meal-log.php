@@ -70,6 +70,7 @@ include __DIR__ . '/partials/head.php';
             </tbody>
           </table>
         </div>
+        <div class="table-footer" id="ml-pagination"></div>
       </div>
 
       <!-- Notes Section -->
@@ -92,30 +93,33 @@ include __DIR__ . '/partials/head.php';
   var dateInput = document.getElementById('log-date');
   dateInput.value = new Date().toISOString().split('T')[0];
 
-  function loadMealLog() {
+  var mlPage = 1;
+
+  function loadMealLog(page) {
+    mlPage = page || 1;
     var date = dateInput.value;
     document.getElementById('log-date-title').textContent =
       'Food Log – ' + new Date(date + 'T00:00:00').toDateString();
 
-    fetch('../backend/get_food_log.php?date=' + encodeURIComponent(date))
+    fetch('../backend/get_food_log.php?date=' + encodeURIComponent(date) + '&page=' + mlPage)
       .then(function(r) { return r.json(); })
       .then(function(data) {
         var tbody = document.getElementById('ml-table');
+        renderPagination(document.getElementById('ml-pagination'), data.pagination, loadMealLog);
+
+        // Whole-day summary comes from the backend (independent of the page).
+        var s = data.summary || { entries: 0, total_cal: 0, largest_name: null, largest_cal: 0 };
+        document.getElementById('total-entries').textContent = s.entries;
+        document.getElementById('ml-cals').innerHTML = (s.total_cal || 0) + ' <span class="text-lg text-gray">kcal</span>';
+        document.getElementById('ml-largest').textContent = s.largest_name
+          ? s.largest_name + ' (' + Math.round(s.largest_cal) + ' kcal)' : '—';
+
         if (!data.success || data.logs.length === 0) {
           tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray">No food logged for this date.</td></tr>';
-          document.getElementById('total-entries').textContent = 0;
-          document.getElementById('ml-cals').innerHTML = '0 <span class="text-lg text-gray">kcal</span>';
-          document.getElementById('ml-largest').textContent = '—';
           return;
         }
 
-        var total = 0;
-        var largest = { name: '—', cal: 0 };
         tbody.innerHTML = data.logs.map(function(log) {
-          total += parseFloat(log.calories_consumed);
-          if (parseFloat(log.calories_consumed) > largest.cal) {
-            largest = { name: log.food_name, cal: log.calories_consumed };
-          }
           return '<tr>' +
             '<td>' + escapeHtml(log.food_name) + '</td>' +
             '<td class="text-gray">' + escapeHtml(log.amount_label) + '</td>' +
@@ -126,10 +130,6 @@ include __DIR__ . '/partials/head.php';
             '</button></td>' +
             '</tr>';
         }).join('');
-
-        document.getElementById('total-entries').textContent = data.logs.length;
-        document.getElementById('ml-cals').innerHTML = total.toFixed(0) + ' <span class="text-lg text-gray">kcal</span>';
-        document.getElementById('ml-largest').textContent = largest.name + ' (' + largest.cal + ' kcal)';
       })
       .catch(function() {
         window.location.href = 'login.php';
@@ -163,16 +163,16 @@ include __DIR__ . '/partials/head.php';
       .then(function(r) { return r.json(); })
       .then(function(data) {
         showToast(data.message, data.success ? 'success' : 'error');
-        if (data.success) loadMealLog();
+        if (data.success) loadMealLog(mlPage);
       })
       .catch(function() { showToast('Network error. Please try again.', 'error'); });
   });
 
   dateInput.addEventListener('change', function() {
-    loadMealLog();
+    loadMealLog(1);
     loadNotes();
   });
-  loadMealLog();
+  loadMealLog(1);
   loadNotes();
 </script>
 </body>

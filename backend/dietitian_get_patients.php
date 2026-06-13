@@ -9,19 +9,29 @@ require_once __DIR__ . '/helpers.php';
 $dietitian_id = require_role('dietitian');
 
 [$start, $end] = day_bounds(date('Y-m-d'));
+[$page, $perPage, $offset] = pagination_args(10);
 
+$total = (int) $conn->query("SELECT COUNT(*) AS c FROM users WHERE assigned_dietitian_id = " . (int) $dietitian_id . " AND role = 'patient'")->fetch_assoc()['c'];
+
+// Page the patients FIRST (inner subquery), then join only that page's logs —
+// today's intake is still aggregated in one query, with no per-patient N+1.
 $stmt = $conn->prepare("
     SELECT u.user_id, u.name, u.age, u.gender, u.height_cm, u.weight_kg, u.activity_level,
            COALESCE(SUM(fl.calories_consumed), 0) AS today_intake
-    FROM users u
+    FROM (
+        SELECT user_id, name, age, gender, height_cm, weight_kg, activity_level
+        FROM users
+        WHERE assigned_dietitian_id = ? AND role = 'patient'
+        ORDER BY name ASC
+        LIMIT ? OFFSET ?
+    ) u
     LEFT JOIN food_logs fl
            ON fl.user_id = u.user_id
           AND fl.logged_at >= ? AND fl.logged_at < ?
-    WHERE u.assigned_dietitian_id = ? AND u.role = 'patient'
     GROUP BY u.user_id, u.name, u.age, u.gender, u.height_cm, u.weight_kg, u.activity_level
     ORDER BY u.name ASC
 ");
-$stmt->bind_param('ssi', $start, $end, $dietitian_id);
+$stmt->bind_param('iiiss', $dietitian_id, $perPage, $offset, $start, $end);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -47,4 +57,8 @@ while ($u = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-json_response(['success' => true, 'patients' => $patients]);
+json_response([
+    'success'    => true,
+    'patients'   => $patients,
+    'pagination' => pagination_meta($total, $page, $perPage),
+]);

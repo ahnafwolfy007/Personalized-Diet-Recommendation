@@ -15,15 +15,40 @@ if (!$d || $d->format('Y-m-d') !== $date) {
 
 [$start, $end] = day_bounds($date);
 
-$stmt = $conn->prepare("
-    SELECT fl.log_id, f.name AS food_name, fl.quantity_g, fl.calories_consumed,
-           fl.serving_unit, fl.serving_amount, fl.logged_at
-    FROM food_logs fl
-    JOIN foods f ON fl.food_id = f.food_id
-    WHERE fl.user_id = ? AND fl.entry_type = 'food' AND fl.logged_at >= ? AND fl.logged_at < ?
-    ORDER BY fl.logged_at DESC
-");
-$stmt->bind_param('iss', $user_id, $start, $end);
+// Paginate only when a page is requested (the Meal Log page); the Log Food
+// "today" list calls without ?page and gets all of the day's entries.
+$paginated = isset($_GET['page']);
+[$page, $perPage, $offset] = pagination_args(15);
+
+$total = 0;
+if ($paginated) {
+    $cnt = $conn->prepare("SELECT COUNT(*) AS c FROM food_logs WHERE user_id = ? AND entry_type = 'food' AND logged_at >= ? AND logged_at < ?");
+    $cnt->bind_param('iss', $user_id, $start, $end);
+    $cnt->execute();
+    $total = (int) $cnt->get_result()->fetch_assoc()['c'];
+    $cnt->close();
+
+    $stmt = $conn->prepare("
+        SELECT fl.log_id, f.name AS food_name, fl.quantity_g, fl.calories_consumed,
+               fl.serving_unit, fl.serving_amount, fl.logged_at
+        FROM food_logs fl
+        JOIN foods f ON fl.food_id = f.food_id
+        WHERE fl.user_id = ? AND fl.entry_type = 'food' AND fl.logged_at >= ? AND fl.logged_at < ?
+        ORDER BY fl.logged_at DESC
+        LIMIT ? OFFSET ?
+    ");
+    $stmt->bind_param('issii', $user_id, $start, $end, $perPage, $offset);
+} else {
+    $stmt = $conn->prepare("
+        SELECT fl.log_id, f.name AS food_name, fl.quantity_g, fl.calories_consumed,
+               fl.serving_unit, fl.serving_amount, fl.logged_at
+        FROM food_logs fl
+        JOIN foods f ON fl.food_id = f.food_id
+        WHERE fl.user_id = ? AND fl.entry_type = 'food' AND fl.logged_at >= ? AND fl.logged_at < ?
+        ORDER BY fl.logged_at DESC
+    ");
+    $stmt->bind_param('iss', $user_id, $start, $end);
+}
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -51,4 +76,33 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-json_response(['success' => true, 'logs' => $logs]);
+$payload = ['success' => true, 'logs' => $logs];
+if ($paginated) {
+    $payload['pagination'] = pagination_meta($total, $page, $perPage);
+
+    // Whole-day summary for the cards (independent of the current page).
+    $s = $conn->prepare("SELECT COALESCE(SUM(calories_consumed), 0) AS total_cal FROM food_logs WHERE user_id = ? AND entry_type = 'food' AND logged_at >= ? AND logged_at < ?");
+    $s->bind_param('iss', $user_id, $start, $end);
+    $s->execute();
+    $total_cal = (int) round($s->get_result()->fetch_assoc()['total_cal'] ?? 0);
+    $s->close();
+
+    $s = $conn->prepare("
+        SELECT f.name AS largest_name, fl.calories_consumed AS largest_cal
+        FROM food_logs fl JOIN foods f ON f.food_id = fl.food_id
+        WHERE fl.user_id = ? AND fl.entry_type = 'food' AND fl.logged_at >= ? AND fl.logged_at < ?
+        ORDER BY fl.calories_consumed DESC LIMIT 1
+    ");
+    $s->bind_param('iss', $user_id, $start, $end);
+    $s->execute();
+    $largest = $s->get_result()->fetch_assoc();
+    $s->close();
+
+    $payload['summary'] = [
+        'entries'      => $total,
+        'total_cal'    => $total_cal,
+        'largest_name' => $largest['largest_name'] ?? null,
+        'largest_cal'  => $largest ? (float) $largest['largest_cal'] : 0,
+    ];
+}
+json_response($payload);

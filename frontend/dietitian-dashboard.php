@@ -38,6 +38,7 @@ include __DIR__ . '/partials/head.php';
             </tbody>
           </table>
         </div>
+        <div class="table-footer" id="requests-pagination"></div>
       </div>
 
       <!-- ======== ASSIGNED PATIENTS TABLE ======== -->
@@ -63,6 +64,7 @@ include __DIR__ . '/partials/head.php';
             </tbody>
           </table>
         </div>
+        <div class="table-footer" id="patients-pagination"></div>
       </div>
 
     </div>
@@ -71,9 +73,12 @@ include __DIR__ . '/partials/head.php';
 </div>
 
 <script>
+  var requestsPage = 1, patientsPage = 1;
+
   // ── LOAD PENDING REQUESTS ───────────────────────────
-  function loadRequests() {
-    fetch('../backend/dietitian_get_requests.php')
+  function loadRequests(page) {
+    requestsPage = page || 1;
+    fetch('../backend/dietitian_get_requests.php?page=' + requestsPage)
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (!data.success) {
@@ -81,6 +86,7 @@ include __DIR__ . '/partials/head.php';
           return;
         }
         var tbody = document.getElementById('requests-table');
+        renderPagination(document.getElementById('requests-pagination'), data.pagination, loadRequests);
 
         if (data.requests.length === 0) {
           tbody.innerHTML = '<tr><td colspan="5" class="text-center text-gray">No pending requests right now.</td></tr>';
@@ -118,8 +124,8 @@ include __DIR__ . '/partials/head.php';
     .then(function(data) {
       showToast(data.message, data.success ? 'success' : 'error');
       if (data.success) {
-        loadRequests();
-        loadPatients();
+        loadRequests(requestsPage);
+        loadPatients(patientsPage);
       }
     })
     .catch(function() {
@@ -128,12 +134,14 @@ include __DIR__ . '/partials/head.php';
   }
 
   // ── LOAD ASSIGNED PATIENTS ──────────────────────────
-  function loadPatients() {
-    fetch('../backend/dietitian_get_patients.php')
+  function loadPatients(page) {
+    patientsPage = page || 1;
+    fetch('../backend/dietitian_get_patients.php?page=' + patientsPage)
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (!data.success) return;
         var tbody = document.getElementById('patients-table');
+        renderPagination(document.getElementById('patients-pagination'), data.pagination, loadPatients);
 
         if (data.patients.length === 0) {
           tbody.innerHTML = '<tr><td colspan="6" class="text-center text-gray">No patients assigned yet. Accept patient requests above.</td></tr>';
@@ -177,15 +185,15 @@ include __DIR__ . '/partials/head.php';
           .then(function(r) { return r.json(); })
           .then(function(data) {
             showToast(data.message, data.success ? 'success' : 'error');
-            if (data.success) { done(); loadPatients(); }
+            if (data.success) { done(); loadPatients(patientsPage); }
           })
           .catch(function() { showToast('Network error. Please try again.', 'error'); });
       }
     });
   });
 
-  loadRequests();
-  loadPatients();
+  loadRequests(1);
+  loadPatients(1);
   initRemovalNotice();
 </script>
 </body>

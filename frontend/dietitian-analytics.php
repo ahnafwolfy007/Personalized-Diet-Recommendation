@@ -35,6 +35,7 @@ include __DIR__ . '/partials/head.php';
             </tbody>
           </table>
         </div>
+        <div class="table-footer" id="analytics-pagination"></div>
       </div>
     </div>
   </main>
@@ -55,11 +56,13 @@ include __DIR__ . '/partials/head.php';
       '<span class="text-sm">' + a + '%</span></div>';
   }
 
-  fetch('../backend/dietitian_get_analytics.php')
+  function loadAnalytics(page) {
+    fetch('../backend/dietitian_get_analytics.php?page=' + (page || 1))
     .then(function (r) { return r.json(); })
     .then(function (data) {
       if (!data.success) { window.location.href = 'login.php'; return; }
       var tbody = document.getElementById('analytics-table');
+      renderPagination(document.getElementById('analytics-pagination'), data.pagination, loadAnalytics);
       if (data.patients.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" class="text-center text-gray">No assigned patients yet.</td></tr>';
         return;
@@ -80,6 +83,9 @@ include __DIR__ . '/partials/head.php';
       document.getElementById('analytics-table').innerHTML =
         '<tr><td colspan="7" class="text-center text-gray">Could not load analytics.</td></tr>';
     });
+  }
+
+  loadAnalytics(1);
 </script>
 </body>
 </html>

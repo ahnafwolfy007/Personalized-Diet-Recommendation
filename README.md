@@ -22,9 +22,11 @@ no frameworks, no build step.
   **Activity Monitor**.
 - **Both sides** — patients and dietitians can end an assignment with a required
   reason that the other party (and the admin) can see.
-- **Throughout** — searchable inputs, non-blocking toast notifications, a
-  responsive layout with a mobile drawer, password show/hide, and keyboard- and
-  screen-reader-friendly controls.
+- **Throughout** — server-side paginated tables, searchable inputs, non-blocking
+  toast notifications, a responsive layout with a mobile drawer, password
+  show/hide, and keyboard- and screen-reader-friendly controls.
+
+> New here? See **[SETUP.md](SETUP.md)** for full, step-by-step run instructions.
 
 ## Tech stack
 

@@ -23,6 +23,7 @@ include __DIR__ . '/partials/head.php';
         <div class="p-6 border-b">
           <h2 class="text-xl">All Users</h2>
           <p class="text-sm text-gray mt-1">Manage system users and their roles</p>
+          <input type="text" id="user-search" class="mt-4" placeholder="Search by name or email…" style="max-width:320px;">
         </div>
         <div class="overflow-x-auto">
           <table>
@@ -41,6 +42,7 @@ include __DIR__ . '/partials/head.php';
             </tbody>
           </table>
         </div>
+        <div class="table-footer" id="users-pagination"></div>
       </div>
 
     </div>
@@ -50,12 +52,17 @@ include __DIR__ . '/partials/head.php';
 
 <script>
   var usersTable = document.getElementById('users-table');
+  var currentPage = 1;
+  var searchQuery = '';
 
-  function loadUsers() {
-    fetch('../backend/admin_get_users.php')
+  function loadUsers(page) {
+    currentPage = page || 1;
+    var url = '../backend/admin_get_users.php?page=' + currentPage + '&q=' + encodeURIComponent(searchQuery);
+    fetch(url)
       .then(function(r) { return r.json(); })
       .then(function(data) {
         if (!data.success) { window.location.href = 'login.php'; return; }
+        renderPagination(document.getElementById('users-pagination'), data.pagination, loadUsers);
         if (data.users.length === 0) {
           usersTable.innerHTML = '<tr><td colspan="6" class="text-center text-gray">No users found.</td></tr>';
           return;
@@ -106,12 +113,20 @@ include __DIR__ . '/partials/head.php';
       .then(function(r) { return r.json(); })
       .then(function(data) {
         showToast(data.message, data.success ? 'success' : 'error');
-        if (data.success) loadUsers();
+        if (data.success) loadUsers(currentPage);
       })
       .catch(function() { showToast('Network error. Please try again.', 'error'); });
   }
 
-  loadUsers();
+  // Debounced search resets to page 1.
+  var searchTimer;
+  document.getElementById('user-search').addEventListener('input', function() {
+    searchQuery = this.value.trim();
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function() { loadUsers(1); }, 300);
+  });
+
+  loadUsers(1);
 </script>
 </body>
 </html>

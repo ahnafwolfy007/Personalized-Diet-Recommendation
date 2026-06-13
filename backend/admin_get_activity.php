@@ -5,13 +5,13 @@
 // so the feed stays signal-rich.
 
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/helpers.php';
 
 require_role('admin');
 
-$page    = max(1, intval($_GET['page'] ?? 1));
-$perPage = 25;
-$offset  = ($page - 1) * $perPage;
-$limit   = $perPage + 1; // fetch one extra to detect "has more"
+[$page, $perPage, $offset] = pagination_args(25);
+
+$total = (int) $conn->query("SELECT COUNT(*) AS c FROM activity_log")->fetch_assoc()['c'];
 
 $stmt = $conn->prepare("
     SELECT a.activity_id, a.actor_role, a.action, a.detail, a.created_at,
@@ -21,7 +21,7 @@ $stmt = $conn->prepare("
     ORDER BY a.created_at DESC, a.activity_id DESC
     LIMIT ? OFFSET ?
 ");
-$stmt->bind_param('ii', $limit, $offset);
+$stmt->bind_param('ii', $perPage, $offset);
 $stmt->execute();
 $res = $stmt->get_result();
 
@@ -37,7 +37,8 @@ while ($row = $res->fetch_assoc()) {
 }
 $stmt->close();
 
-$has_more = count($rows) > $perPage;
-if ($has_more) array_pop($rows);
-
-json_response(['success' => true, 'activity' => $rows, 'page' => $page, 'has_more' => $has_more]);
+json_response([
+    'success'    => true,
+    'activity'   => $rows,
+    'pagination' => pagination_meta($total, $page, $perPage),
+]);
