@@ -33,23 +33,38 @@ database/
 ## Setup
 
 1. Start MySQL/MariaDB (e.g. via XAMPP).
-2. Create the database and tables:
+2. Create the database and tables (**fresh install**):
    ```
    mysql -u root < database/schema.sql
    ```
-   (Optional demo data: `mysql -u root dietsync < database/dummy_data.sql`)
+   Optional demo data (dietitians, patients, plans, logs, feedback):
+   ```
+   mysql -u root dietsync < database/dummy_data.sql
+   ```
+   **Existing database** from the old dump? Apply the indexes instead:
+   ```
+   mysql -u root dietsync < database/migration.sql
+   ```
 3. Adjust credentials in `backend/config.php` if your MySQL user/password differ.
 4. Serve the project root with PHP and open `frontend/index.php`.
 
 ### Default accounts
 
-All seeded accounts use the password **`password`**.
+Seeded by `schema.sql` — password is **`password`**:
 
 | Role      | Email                 |
 |-----------|-----------------------|
 | Admin     | admin@dietsync.com    |
 | Dietitian | sarah@dietsync.com    |
 | Patient   | john@dietsync.com     |
+
+Seeded by `dummy_data.sql` (richer history) — password is **`password123`**:
+
+| Role      | Email                | Notes                          |
+|-----------|----------------------|--------------------------------|
+| Dietitian | emma@dietsync.com    | has Alice & Bob assigned       |
+| Patient   | alice@dietsync.com   | plan + food logs + feedback    |
+| Patient   | bob@dietsync.com     | plan + food logs               |
 
 ## Security model
 
@@ -61,3 +76,7 @@ All seeded accounts use the password **`password`**.
   mutating `fetch` automatically by `assets/app.js`.
 - All dynamic values rendered into the DOM are escaped with `escapeHtml()`.
 - Passwords are hashed with bcrypt; the session id is regenerated on login.
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a detailed record of changes.
