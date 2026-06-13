@@ -54,22 +54,30 @@ CREATE TABLE IF NOT EXISTS foods (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ------------------------------------------------------------
--- food_logs : each food a user logs
+-- food_logs : the single table for EVERY patient entry.
+--   entry_type   : 'food' (default) or 'water'
+--   food_id      : the food (NULL for water rows)
+--   quantity_g   : resolved grams calories derive from; for water, millilitres
+--   serving_unit / serving_amount : the unit + amount the user picked
+--                  ('g'/'portion'/'glass'/'tbsp'/'tsp', or 'ml' for water)
+--   plan_item_id : set when the row came from ticking a diet-plan item "Taken"
 -- Composite (user_id, logged_at) index serves the daily range queries.
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS food_logs (
     log_id            INT AUTO_INCREMENT PRIMARY KEY,
     user_id           INT   NOT NULL,
-    food_id           INT   NOT NULL,
+    food_id           INT   NULL,
+    entry_type        ENUM('food','water') NOT NULL DEFAULT 'food',
     quantity_g        FLOAT NOT NULL,
     calories_consumed FLOAT NOT NULL,
-    -- Measurement metadata: the unit/amount the user picked (Portion, Glass, etc).
-    -- quantity_g remains the resolved grams that calories are computed from.
     serving_unit      VARCHAR(20) NOT NULL DEFAULT 'g',
     serving_amount    FLOAT       DEFAULT NULL,
+    plan_item_id      INT         DEFAULT NULL,
     logged_at         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY idx_food_logs_user_logged (user_id, logged_at),
+    KEY idx_food_logs_type (user_id, entry_type, logged_at),
     KEY idx_food_logs_food (food_id),
+    KEY idx_food_logs_plan_item (plan_item_id),
     CONSTRAINT fk_food_logs_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
     CONSTRAINT fk_food_logs_food FOREIGN KEY (food_id) REFERENCES foods(food_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -85,6 +93,7 @@ CREATE TABLE IF NOT EXISTS diet_plans (
     lunch_text     TEXT,
     dinner_text    TEXT,
     notes          TEXT,
+    water_goal_ml  INT  DEFAULT NULL,
     created_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uniq_plan_patient_dietitian (patient_id, dietitian_id),
@@ -128,46 +137,26 @@ CREATE TABLE IF NOT EXISTS dietitian_requests (
 -- ------------------------------------------------------------
 -- diet_plan_items : database-driven meal plan rows (food + amount)
 -- ------------------------------------------------------------
+-- diet_plan_items : food + amount rows of a database-driven plan. The dietitian
+-- picks an amount in the same units as the patient (g/portion/glass/tbsp/tsp);
+-- quantity_g is the resolved grams and calories the computed total.
 CREATE TABLE IF NOT EXISTS diet_plan_items (
-    item_id    INT AUTO_INCREMENT PRIMARY KEY,
-    plan_id    INT   NOT NULL,
-    meal       ENUM('breakfast','lunch','dinner') NOT NULL,
-    food_id    INT   NOT NULL,
-    quantity_g FLOAT NOT NULL,
-    calories   FLOAT NOT NULL,
+    item_id        INT AUTO_INCREMENT PRIMARY KEY,
+    plan_id        INT   NOT NULL,
+    meal           ENUM('breakfast','lunch','dinner') NOT NULL,
+    food_id        INT   NOT NULL,
+    quantity_g     FLOAT NOT NULL,
+    serving_unit   VARCHAR(20) NOT NULL DEFAULT 'g',
+    serving_amount FLOAT NULL,
+    calories       FLOAT NOT NULL,
     KEY idx_plan_items_plan_meal (plan_id, meal),
     KEY idx_plan_items_food (food_id),
     CONSTRAINT fk_plan_items_plan FOREIGN KEY (plan_id) REFERENCES diet_plans(plan_id) ON DELETE CASCADE,
     CONSTRAINT fk_plan_items_food FOREIGN KEY (food_id) REFERENCES foods(food_id)     ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ------------------------------------------------------------
--- meal_completions : a patient's "Taken/Done" tick for a plan item on a day
--- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS meal_completions (
-    completion_id INT AUTO_INCREMENT PRIMARY KEY,
-    patient_id    INT  NOT NULL,
-    item_id       INT  NOT NULL,
-    completed_on  DATE NOT NULL,
-    log_id        INT  NULL,
-    UNIQUE KEY uniq_completion_item_day (item_id, completed_on),
-    KEY idx_completions_patient_day (patient_id, completed_on),
-    CONSTRAINT fk_completions_patient FOREIGN KEY (patient_id) REFERENCES users(user_id)           ON DELETE CASCADE,
-    CONSTRAINT fk_completions_item    FOREIGN KEY (item_id)    REFERENCES diet_plan_items(item_id) ON DELETE CASCADE,
-    CONSTRAINT fk_completions_log     FOREIGN KEY (log_id)     REFERENCES food_logs(log_id)        ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- ------------------------------------------------------------
--- water_logs : daily water intake entries
--- ------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS water_logs (
-    water_id  INT AUTO_INCREMENT PRIMARY KEY,
-    user_id   INT NOT NULL,
-    amount_ml INT NOT NULL,
-    logged_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    KEY idx_water_user_logged (user_id, logged_at),
-    CONSTRAINT fk_water_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- Note: water intake and "Taken" plan-item ticks are stored in food_logs
+-- (entry_type='water' and plan_item_id respectively) — no separate tables.
 
 -- ------------------------------------------------------------
 -- assignment_removals : rationale recorded when a patient/dietitian unassigns

@@ -68,19 +68,36 @@ include __DIR__ . '/partials/head.php';
           <div class="mt-6 border-t" style="padding-top:1rem;">
             <button type="button" id="toggle-add-food" class="btn-link">+ Can't find it? Add a food</button>
             <div id="add-food-form" class="hidden mt-4">
-              <div class="form-group">
-                <label for="nf-name">Food name</label>
-                <input type="text" id="nf-name" placeholder="e.g. Homemade lentil curry" maxlength="150">
-              </div>
               <div class="grid grid-cols-2 gap-4">
                 <div class="form-group">
-                  <label for="nf-cals">Calories per 100g</label>
-                  <input type="number" id="nf-cals" min="1" max="1000" step="0.1" placeholder="120">
+                  <label for="nf-name">Food name</label>
+                  <input type="text" id="nf-name" placeholder="e.g. Homemade lentil curry" maxlength="150">
                 </div>
                 <div class="form-group">
                   <label for="nf-cat">Category</label>
-                  <input type="text" id="nf-cat" placeholder="General" maxlength="50">
+                  <div class="select-wrapper">
+                    <select id="nf-cat"><?php include __DIR__ . '/partials/category_options.php'; ?></select>
+                    <span class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+                  </div>
                 </div>
+              </div>
+              <div class="form-group">
+                <label>Calories for a known amount</label>
+                <div class="flex gap-2">
+                  <input type="number" id="nf-amount" value="100" min="0.1" step="0.1" placeholder="amount" style="width:90px;">
+                  <div class="select-wrapper" style="flex:1;">
+                    <select id="nf-unit">
+                      <option value="g">Grams (g)</option>
+                      <option value="portion">Portion</option>
+                      <option value="glass">Glass</option>
+                      <option value="tbsp">Table-spoon</option>
+                      <option value="tsp">Tea-spoon</option>
+                    </select>
+                    <span class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+                  </div>
+                  <input type="number" id="nf-cals" min="1" step="1" placeholder="kcal" style="width:90px;">
+                </div>
+                <p class="text-xs text-gray mt-1">e.g. “1 glass = 60 kcal”. We convert it to calories per 100g.</p>
               </div>
               <button type="button" id="save-food-btn" class="btn btn-secondary btn-sm">Save food</button>
               <p class="text-xs text-gray mt-2">New foods are marked <span class="badge badge-yellow">Unverified</span> until an admin reviews them.</p>
@@ -320,16 +337,21 @@ include __DIR__ . '/partials/head.php';
   });
 
   document.getElementById('save-food-btn').addEventListener('click', function() {
-    var name = document.getElementById('nf-name').value.trim();
-    var cals = document.getElementById('nf-cals').value;
-    var cat  = document.getElementById('nf-cat').value.trim() || 'General';
+    var name   = document.getElementById('nf-name').value.trim();
+    var cat    = document.getElementById('nf-cat').value;
+    var amount = document.getElementById('nf-amount').value;
+    var unit   = document.getElementById('nf-unit').value;
+    var cals   = document.getElementById('nf-cals').value;
     if (!name) { showToast('Enter a food name.', 'error'); return; }
-    if (!cals || cals <= 0) { showToast('Enter calories per 100g.', 'error'); return; }
+    if (!amount || amount <= 0) { showToast('Enter the amount.', 'error'); return; }
+    if (!cals || cals <= 0) { showToast('Enter the calories for that amount.', 'error'); return; }
 
     var fd = new FormData();
     fd.append('name', name);
-    fd.append('calories_per_100g', cals);
     fd.append('category', cat);
+    fd.append('serving_unit', unit);
+    fd.append('serving_amount', amount);
+    fd.append('calories', cals);
 
     var btn = this;
     btn.disabled = true;
@@ -344,7 +366,7 @@ include __DIR__ . '/partials/head.php';
           chooseFood(data.food);
           document.getElementById('nf-name').value = '';
           document.getElementById('nf-cals').value = '';
-          document.getElementById('nf-cat').value  = '';
+          document.getElementById('nf-amount').value = '100';
           document.getElementById('add-food-form').classList.add('hidden');
         }
       })

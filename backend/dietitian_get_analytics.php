@@ -66,9 +66,9 @@ if (!empty($patients)) {
     // 3) Water today.
     $stmt = $conn->prepare("
         SELECT u.user_id,
-               COALESCE(SUM(CASE WHEN w.logged_at >= ? AND w.logged_at < ? THEN w.amount_ml END), 0) AS water_today
+               COALESCE(SUM(CASE WHEN w.entry_type = 'water' AND w.logged_at >= ? AND w.logged_at < ? THEN w.quantity_g END), 0) AS water_today
         FROM users u
-        LEFT JOIN water_logs w ON w.user_id = u.user_id
+        LEFT JOIN food_logs w ON w.user_id = u.user_id
         WHERE u.assigned_dietitian_id = ? AND u.role = 'patient'
         GROUP BY u.user_id
     ");
@@ -96,16 +96,17 @@ if (!empty($patients)) {
     while ($row = $res->fetch_assoc()) { $itemCounts[(int) $row['patient_id']] = (int) $row['items']; }
     $stmt->close();
 
-    // 5) Completions over the last 7 days (numerator for adherence).
+    // 5) "Taken" plan-item logs over the last 7 days (numerator for adherence).
+    //    These are food_logs rows that carry a plan_item_id.
     $doneCounts = [];
     $stmt = $conn->prepare("
-        SELECT mc.patient_id, COUNT(*) AS done
-        FROM meal_completions mc
-        JOIN users u ON u.user_id = mc.patient_id
-        WHERE u.assigned_dietitian_id = ? AND mc.completed_on >= ?
-        GROUP BY mc.patient_id
+        SELECT fl.user_id AS patient_id, COUNT(*) AS done
+        FROM food_logs fl
+        JOIN users u ON u.user_id = fl.user_id
+        WHERE u.assigned_dietitian_id = ? AND fl.plan_item_id IS NOT NULL AND fl.logged_at >= ?
+        GROUP BY fl.user_id
     ");
-    $stmt->bind_param('is', $dietitian_id, $weekStartD);
+    $stmt->bind_param('is', $dietitian_id, $weekStart);
     $stmt->execute();
     $res = $stmt->get_result();
     while ($row = $res->fetch_assoc()) { $doneCounts[(int) $row['patient_id']] = (int) $row['done']; }

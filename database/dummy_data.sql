@@ -234,14 +234,18 @@ INSERT INTO `diet_plan_items` (`plan_id`, `meal`, `food_id`, `quantity_g`, `calo
   (2, 'dinner',    111, 150, 135.0);   -- Sweet Potato
 
 -- ─────────────────────────────────────────────────────────────
--- 8. WATER LOGS (Alice = 11) across a few days
+-- 8. WATER ENTRIES (Alice = 11) — stored in food_logs (entry_type='water').
+--    quantity_g holds the millilitres; calories are 0.
 -- ─────────────────────────────────────────────────────────────
-INSERT INTO `water_logs` (`user_id`, `amount_ml`, `logged_at`) VALUES
-  (11, 250, '2026-06-13 08:00:00'),
-  (11, 500, '2026-06-13 12:30:00'),
-  (11, 250, '2026-06-13 16:00:00'),
-  (11, 500, '2026-06-13 19:30:00'),
-  (11, 250, '2026-06-12 09:00:00'),
-  (11, 500, '2026-06-12 14:00:00');
+INSERT INTO `food_logs` (`user_id`, `food_id`, `entry_type`, `quantity_g`, `calories_consumed`, `serving_unit`, `serving_amount`, `logged_at`) VALUES
+  (11, NULL, 'water', 250, 0, 'ml', 250, '2026-06-13 08:00:00'),
+  (11, NULL, 'water', 500, 0, 'ml', 500, '2026-06-13 12:30:00'),
+  (11, NULL, 'water', 250, 0, 'ml', 250, '2026-06-13 16:00:00'),
+  (11, NULL, 'water', 500, 0, 'ml', 500, '2026-06-13 19:30:00'),
+  (11, NULL, 'water', 250, 0, 'ml', 250, '2026-06-12 09:00:00'),
+  (11, NULL, 'water', 500, 0, 'ml', 500, '2026-06-12 14:00:00');
+
+-- A dietitian-set water goal for Alice's plan.
+UPDATE `diet_plans` SET `water_goal_ml` = 2500 WHERE `plan_id` = 2;
 
 SET FOREIGN_KEY_CHECKS = 1;

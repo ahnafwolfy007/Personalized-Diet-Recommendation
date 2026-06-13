@@ -2,6 +2,33 @@
 
 All notable changes to DietSync are documented here.
 
+## [Refinements] – 2026-06-14
+
+Follow-up corrections and consolidation on top of the feature upgrade.
+
+- **One log table for everything.** Water intake and "Taken" diet-plan ticks no
+  longer use separate tables — every patient entry lives in `food_logs`
+  (`entry_type` of `food`/`water`; `plan_item_id` set when a row came from
+  ticking a plan item; `food_id` is now NULLable for water). The `water_logs`
+  and `meal_completions` tables are dropped.
+- **Fixed: freshly logged food not appearing in "today".** Log inserts now write
+  `logged_at` from PHP instead of MySQL `CURRENT_TIMESTAMP`, so the stored time
+  uses the same clock/zone as the day-range filter the "today" views run with — a
+  PHP/MySQL timezone gap could previously hide a just-logged entry.
+- **Measurement units for meal plans.** Dietitians now pick an amount in the same
+  household units patients use (g/portion/glass/tbsp/tsp); the unit→grams
+  conversion and calories are computed server-side and stored on the plan item.
+- **Dietitian-set water goal.** A dietitian can set a daily water goal on the
+  plan; it shows on the patient's Water Intake page (default 2000 ml otherwise).
+- **Admins can add foods** directly from the Foods page (added foods are verified
+  immediately).
+- **Smarter add-food input.** Adding a food now uses a category dropdown and lets
+  you enter "calories for a known amount" in any unit; the backend normalizes
+  that to calories-per-100g before storing.
+- **Verification keeps history correct.** When an admin changes a food's
+  calories-per-100g, every existing `food_logs` entry (and diet-plan item) for
+  that food is recalculated from its stored grams, inside a transaction.
+
 ## [Feature upgrade] – 2026-06-14
 
 A large feature pass spanning authentication, profiles, meal logging, plans,

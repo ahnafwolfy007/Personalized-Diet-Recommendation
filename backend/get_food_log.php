@@ -20,7 +20,7 @@ $stmt = $conn->prepare("
            fl.serving_unit, fl.serving_amount, fl.logged_at
     FROM food_logs fl
     JOIN foods f ON fl.food_id = f.food_id
-    WHERE fl.user_id = ? AND fl.logged_at >= ? AND fl.logged_at < ?
+    WHERE fl.user_id = ? AND fl.entry_type = 'food' AND fl.logged_at >= ? AND fl.logged_at < ?
     ORDER BY fl.logged_at DESC
 ");
 $stmt->bind_param('iss', $user_id, $start, $end);

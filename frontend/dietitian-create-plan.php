@@ -69,10 +69,20 @@ include __DIR__ . '/partials/head.php';
                 <input type="text" id="food-search" class="combo-input" placeholder="Search foods…" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="food-options" aria-autocomplete="list">
                 <ul class="combo-list hidden" id="food-options" role="listbox" aria-label="Food results"></ul>
               </div>
-              <input type="number" id="amount-input" placeholder="grams" min="1" step="1" value="100" style="width:110px;">
+              <input type="number" id="amount-input" placeholder="amount" min="0.1" step="0.1" value="100" style="width:90px;">
+              <div class="select-wrapper" style="min-width:130px;">
+                <select id="unit-select">
+                  <option value="g">Grams (g)</option>
+                  <option value="portion">Portion</option>
+                  <option value="glass">Glass</option>
+                  <option value="tbsp">Table-spoon</option>
+                  <option value="tsp">Tea-spoon</option>
+                </select>
+                <span class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </div>
               <button type="button" id="add-item-btn" class="btn btn-primary">Add</button>
             </div>
-            <p class="text-xs text-gray mt-2" id="item-preview"></p>
+            <p class="text-xs text-gray mt-2" id="item-preview">Standard amounts: 1 portion = 150g · 1 glass = 250g · 1 tbsp = 15g · 1 tsp = 5g.</p>
           </div>
 
           <!-- Items table -->
@@ -89,11 +99,16 @@ include __DIR__ . '/partials/head.php';
             </div>
           </div>
 
-          <!-- Notes + save -->
+          <!-- Notes + water goal + save -->
           <div class="card p-6">
             <div class="form-group">
-              <label for="notes">3. Notes / instructions</label>
-              <textarea id="notes" rows="4" placeholder="e.g. Drink 2L water daily. Avoid fried food. Eat every 3-4 hours…"></textarea>
+              <label for="water-goal">3. Daily water goal (ml)</label>
+              <input type="number" id="water-goal" min="0" max="10000" step="50" placeholder="e.g. 2000" style="max-width:220px;">
+              <p class="text-xs text-gray mt-1">Shown to the patient on their Water Intake page. Leave blank for the default (2000 ml).</p>
+            </div>
+            <div class="form-group">
+              <label for="notes">4. Notes / instructions</label>
+              <textarea id="notes" rows="4" placeholder="e.g. Avoid fried food. Eat every 3-4 hours…"></textarea>
             </div>
             <button type="button" id="save-btn" class="btn btn-primary flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -108,13 +123,18 @@ include __DIR__ . '/partials/head.php';
 </div>
 
 <script>
+  // Standard unit→grams factors (must match backend serving_units()).
+  var UNIT_GRAMS = { g: 1, portion: 150, glass: 250, tbsp: 15, tsp: 5 };
+  var UNIT_LABEL = { g: 'g', portion: 'portion', glass: 'glass', tbsp: 'tbsp', tsp: 'tsp' };
+
   var allFoods = [], filtered = [], activeIndex = -1, selectedFood = null;
-  var planItems = [];      // {meal, food_id, food_name, quantity_g, calories}
+  var planItems = [];  // {meal, food_id, food_name, serving_unit, serving_amount, quantity_g, calories}
   var dailyNeed = 0;
 
   var searchInput = document.getElementById('food-search');
   var optionsList = document.getElementById('food-options');
   var amountInput = document.getElementById('amount-input');
+  var unitSelect  = document.getElementById('unit-select');
 
   // ── Load assigned patients ──
   fetch('../backend/dietitian_get_all_patients.php')
@@ -152,8 +172,11 @@ include __DIR__ . '/partials/head.php';
         if (!data.success) { showToast(data.message || 'Could not load plan.', 'error'); return; }
         dailyNeed = Number(data.daily_need) || 0;
         document.getElementById('notes').value = data.notes || '';
+        document.getElementById('water-goal').value = data.water_goal_ml || '';
         planItems = (data.items || []).map(function (it) {
           return { meal: it.meal, food_id: Number(it.food_id), food_name: it.food_name,
+                   serving_unit: it.serving_unit || 'g',
+                   serving_amount: Number(it.serving_amount != null ? it.serving_amount : it.quantity_g),
                    quantity_g: Number(it.quantity_g), calories: Number(it.calories) };
         });
         document.getElementById('builder').classList.remove('hidden');
@@ -200,25 +223,31 @@ include __DIR__ . '/partials/head.php';
   });
   document.addEventListener('click', function (e) { if (!document.getElementById('food-combo').contains(e.target)) closeSearch(); });
   amountInput.addEventListener('input', updatePreview);
+  unitSelect.addEventListener('change', updatePreview);
 
   function updatePreview() {
-    var grams = parseFloat(amountInput.value) || 0;
+    var amount = parseFloat(amountInput.value) || 0;
+    var unit = unitSelect.value;
+    var grams = amount * (UNIT_GRAMS[unit] || 1);
     var prev = document.getElementById('item-preview');
     if (selectedFood && grams > 0) {
       var cal = (selectedFood.calories_per_100g / 100) * grams;
-      prev.textContent = selectedFood.name + ': ' + grams + 'g ≈ ' + Math.round(cal) + ' kcal';
+      var u = unit === 'g' ? amount + 'g' : (amount + ' ' + UNIT_LABEL[unit] + ' = ' + Math.round(grams) + 'g');
+      prev.textContent = selectedFood.name + ': ' + u + ' ≈ ' + Math.round(cal) + ' kcal';
     } else { prev.textContent = ''; }
   }
 
   // ── Add item ──
   document.getElementById('add-item-btn').addEventListener('click', function () {
-    var grams = parseFloat(amountInput.value);
+    var amount = parseFloat(amountInput.value);
+    var unit = unitSelect.value;
     if (!selectedFood) { showToast('Search and select a food first.', 'error'); return; }
-    if (!grams || grams <= 0) { showToast('Enter a valid amount in grams.', 'error'); return; }
+    if (!amount || amount <= 0) { showToast('Enter a valid amount.', 'error'); return; }
+    var grams = amount * (UNIT_GRAMS[unit] || 1);
     var cal = Math.round((selectedFood.calories_per_100g / 100) * grams * 10) / 10;
     planItems.push({ meal: document.getElementById('meal-select').value, food_id: Number(selectedFood.food_id),
-      food_name: selectedFood.name, quantity_g: grams, calories: cal });
-    selectedFood = null; searchInput.value = ''; document.getElementById('item-preview').textContent = '';
+      food_name: selectedFood.name, serving_unit: unit, serving_amount: amount, quantity_g: grams, calories: cal });
+    selectedFood = null; searchInput.value = ''; updatePreview();
     renderItems();
   });
 
@@ -236,7 +265,11 @@ include __DIR__ . '/partials/head.php';
         return '<tr>' +
           '<td><span class="badge badge-gray">' + MEAL_LABELS[x.it.meal] + '</span></td>' +
           '<td>' + escapeHtml(x.it.food_name) + '</td>' +
-          '<td class="text-right text-gray">' + Math.round(x.it.quantity_g) + 'g</td>' +
+          '<td class="text-right text-gray">' +
+            (x.it.serving_unit === 'g'
+              ? Math.round(x.it.quantity_g) + 'g'
+              : x.it.serving_amount + ' ' + (UNIT_LABEL[x.it.serving_unit] || x.it.serving_unit) + ' (' + Math.round(x.it.quantity_g) + 'g)') +
+          '</td>' +
           '<td class="text-right">' + Math.round(x.it.calories) + ' kcal</td>' +
           '<td class="text-right"><button class="row-action js-remove" data-i="' + x.i + '" aria-label="Remove ' + escapeHtml(x.it.food_name) + '">' +
             '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>' +
@@ -289,8 +322,9 @@ include __DIR__ . '/partials/head.php';
     var fd = new FormData();
     fd.append('patient_id', pid);
     fd.append('notes', document.getElementById('notes').value);
+    fd.append('water_goal_ml', document.getElementById('water-goal').value || '');
     fd.append('items', JSON.stringify(planItems.map(function (it) {
-      return { meal: it.meal, food_id: it.food_id, quantity_g: it.quantity_g };
+      return { meal: it.meal, food_id: it.food_id, serving_unit: it.serving_unit, serving_amount: it.serving_amount };
     })));
 
     fetch('../backend/dietitian_create_plan.php', { method: 'POST', body: fd })

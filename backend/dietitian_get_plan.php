@@ -35,7 +35,7 @@ $daily_need = daily_calorie_need(
 );
 
 // Existing plan (if any) for this pair.
-$stmt = $conn->prepare("SELECT plan_id, notes FROM diet_plans WHERE patient_id = ? AND dietitian_id = ?");
+$stmt = $conn->prepare("SELECT plan_id, notes, water_goal_ml FROM diet_plans WHERE patient_id = ? AND dietitian_id = ?");
 $stmt->bind_param('ii', $patient_id, $dietitian_id);
 $stmt->execute();
 $plan = $stmt->get_result()->fetch_assoc();
@@ -44,7 +44,8 @@ $stmt->close();
 $items = [];
 if ($plan) {
     $stmt = $conn->prepare("
-        SELECT i.item_id, i.meal, i.food_id, f.name AS food_name, i.quantity_g, i.calories
+        SELECT i.item_id, i.meal, i.food_id, f.name AS food_name,
+               i.quantity_g, i.serving_unit, i.serving_amount, i.calories
         FROM diet_plan_items i
         JOIN foods f ON f.food_id = i.food_id
         WHERE i.plan_id = ?
@@ -55,20 +56,23 @@ if ($plan) {
     $res = $stmt->get_result();
     while ($row = $res->fetch_assoc()) {
         $items[] = [
-            'meal'       => $row['meal'],
-            'food_id'    => (int) $row['food_id'],
-            'food_name'  => $row['food_name'],
-            'quantity_g' => (float) $row['quantity_g'],
-            'calories'   => (float) $row['calories'],
+            'meal'           => $row['meal'],
+            'food_id'        => (int) $row['food_id'],
+            'food_name'      => $row['food_name'],
+            'quantity_g'     => (float) $row['quantity_g'],
+            'serving_unit'   => $row['serving_unit'] ?: 'g',
+            'serving_amount' => $row['serving_amount'] !== null ? (float) $row['serving_amount'] : (float) $row['quantity_g'],
+            'calories'       => (float) $row['calories'],
         ];
     }
     $stmt->close();
 }
 
 json_response([
-    'success'      => true,
-    'patient_name' => $patient['name'],
-    'daily_need'   => $daily_need,
-    'notes'        => $plan['notes'] ?? '',
-    'items'        => $items,
+    'success'       => true,
+    'patient_name'  => $patient['name'],
+    'daily_need'    => $daily_need,
+    'notes'         => $plan['notes'] ?? '',
+    'water_goal_ml' => $plan && $plan['water_goal_ml'] !== null ? (int) $plan['water_goal_ml'] : null,
+    'items'         => $items,
 ]);

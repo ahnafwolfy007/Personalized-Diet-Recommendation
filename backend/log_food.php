@@ -47,11 +47,16 @@ if (!$food) {
 
 $calories = round(($food['calories_per_100g'] / 100) * $quantity_g, 1);
 
+// Write logged_at from PHP (not MySQL CURRENT_TIMESTAMP) so the stored time uses
+// the same clock/zone as the day_bounds() filter the "today" views run with —
+// otherwise a PHP/MySQL timezone gap can hide a just-logged entry from today.
+$now = date('Y-m-d H:i:s');
+
 $stmt = $conn->prepare(
-    "INSERT INTO food_logs (user_id, food_id, quantity_g, calories_consumed, serving_unit, serving_amount)
-     VALUES (?, ?, ?, ?, ?, ?)"
+    "INSERT INTO food_logs (user_id, food_id, entry_type, quantity_g, calories_consumed, serving_unit, serving_amount, logged_at)
+     VALUES (?, ?, 'food', ?, ?, ?, ?, ?)"
 );
-$stmt->bind_param('iiddsd', $user_id, $food_id, $quantity_g, $calories, $unit, $amount);
+$stmt->bind_param('iiddsds', $user_id, $food_id, $quantity_g, $calories, $unit, $amount, $now);
 $ok = $stmt->execute();
 $stmt->close();
 

@@ -21,7 +21,7 @@ if ($role === 'patient') {
         LEFT JOIN (
             SELECT food_id, COUNT(*) AS uses, MAX(logged_at) AS last_logged
             FROM food_logs
-            WHERE user_id = ?
+            WHERE user_id = ? AND entry_type = 'food' AND food_id IS NOT NULL
             GROUP BY food_id
         ) u ON u.food_id = f.food_id
         ORDER BY (u.uses IS NULL), u.last_logged DESC, u.uses DESC, f.category, f.name

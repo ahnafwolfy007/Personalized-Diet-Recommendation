@@ -76,6 +76,15 @@ if (!function_exists('serving_units')) {
     }
 }
 
+if (!function_exists('food_categories')) {
+    /** The fixed set of food categories offered in the add/edit-food dropdowns. */
+    function food_categories(): array
+    {
+        return ['Grain', 'Protein', 'Dairy', 'Fruit', 'Vegetable', 'Legume', 'Nut',
+                'Oil', 'Beverage', 'Sweet', 'Prepared', 'Condiment', 'General'];
+    }
+}
+
 if (!function_exists('serving_to_grams')) {
     /**
      * Convert an amount in the given unit to grams using serving_units().

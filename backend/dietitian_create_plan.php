@@ -17,6 +17,10 @@ $patient_id = intval($_POST['patient_id'] ?? 0);
 $notes      = trim($_POST['notes'] ?? '');
 $itemsJson  = $_POST['items'] ?? '[]';
 
+// Optional dietitian-set daily water goal for the patient.
+$water_goal = isset($_POST['water_goal_ml']) ? intval($_POST['water_goal_ml']) : 0;
+$water_goal = ($water_goal > 0 && $water_goal <= 10000) ? $water_goal : null;
+
 if ($patient_id <= 0) {
     json_response(['success' => false, 'message' => 'Please select a patient.']);
 }
@@ -58,11 +62,18 @@ $total = 0.0;
 
 $foodStmt = $conn->prepare("SELECT calories_per_100g FROM foods WHERE food_id = ?");
 foreach ($rawItems as $it) {
-    $meal = is_array($it) ? ($it['meal'] ?? '') : '';
-    $fid  = (int) ($it['food_id'] ?? 0);
-    $qty  = (float) ($it['quantity_g'] ?? 0);
+    $meal   = is_array($it) ? ($it['meal'] ?? '') : '';
+    $fid    = (int) ($it['food_id'] ?? 0);
+    // Amount + unit (same household measurements the patient uses); convert to
+    // grams server-side so calories can't be spoofed by the client.
+    $unit   = trim((string) ($it['serving_unit'] ?? 'g'));
+    if (!array_key_exists($unit, serving_units())) {
+        $unit = 'g';
+    }
+    $amount = (float) ($it['serving_amount'] ?? 0);
+    $qty    = round(serving_to_grams($unit, $amount), 1);
 
-    if (!in_array($meal, $validMeals, true) || $fid <= 0 || $qty <= 0 || $qty > 5000) {
+    if (!in_array($meal, $validMeals, true) || $fid <= 0 || $amount <= 0 || $qty <= 0 || $qty > 5000) {
         $foodStmt->close();
         json_response(['success' => false, 'message' => 'One of the plan items is invalid.']);
     }
@@ -77,7 +88,8 @@ foreach ($rawItems as $it) {
 
     $cal = round(($food['calories_per_100g'] / 100) * $qty, 1);
     $total += $cal;
-    $clean[] = ['meal' => $meal, 'food_id' => $fid, 'quantity_g' => round($qty, 1), 'calories' => $cal];
+    $clean[] = ['meal' => $meal, 'food_id' => $fid, 'quantity_g' => $qty,
+                'serving_unit' => $unit, 'serving_amount' => $amount, 'calories' => $cal];
 }
 $foodStmt->close();
 
@@ -101,8 +113,8 @@ try {
 
     if ($existing) {
         $plan_id = (int) $existing['plan_id'];
-        $stmt = $conn->prepare("UPDATE diet_plans SET notes = ? WHERE plan_id = ?");
-        $stmt->bind_param('si', $notes, $plan_id);
+        $stmt = $conn->prepare("UPDATE diet_plans SET notes = ?, water_goal_ml = ? WHERE plan_id = ?");
+        $stmt->bind_param('sii', $notes, $water_goal, $plan_id);
         if (!$stmt->execute()) { throw new RuntimeException($stmt->error); }
         $stmt->close();
         $action = 'updated';
@@ -112,17 +124,17 @@ try {
         if (!$del->execute()) { throw new RuntimeException($del->error); }
         $del->close();
     } else {
-        $stmt = $conn->prepare("INSERT INTO diet_plans (patient_id, dietitian_id, notes) VALUES (?, ?, ?)");
-        $stmt->bind_param('iis', $patient_id, $dietitian_id, $notes);
+        $stmt = $conn->prepare("INSERT INTO diet_plans (patient_id, dietitian_id, notes, water_goal_ml) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param('iisi', $patient_id, $dietitian_id, $notes, $water_goal);
         if (!$stmt->execute()) { throw new RuntimeException($stmt->error); }
         $plan_id = (int) $stmt->insert_id;
         $stmt->close();
         $action = 'created';
     }
 
-    $ins = $conn->prepare("INSERT INTO diet_plan_items (plan_id, meal, food_id, quantity_g, calories) VALUES (?, ?, ?, ?, ?)");
+    $ins = $conn->prepare("INSERT INTO diet_plan_items (plan_id, meal, food_id, quantity_g, serving_unit, serving_amount, calories) VALUES (?, ?, ?, ?, ?, ?, ?)");
     foreach ($clean as $c) {
-        $ins->bind_param('isidd', $plan_id, $c['meal'], $c['food_id'], $c['quantity_g'], $c['calories']);
+        $ins->bind_param('isidsdd', $plan_id, $c['meal'], $c['food_id'], $c['quantity_g'], $c['serving_unit'], $c['serving_amount'], $c['calories']);
         if (!$ins->execute()) { throw new RuntimeException($ins->error); }
     }
     $ins->close();

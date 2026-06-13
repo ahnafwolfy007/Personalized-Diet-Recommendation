@@ -64,6 +64,13 @@ include __DIR__ . '/partials/head.php';
 
 <script>
   var MEAL_LABELS = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' };
+  var UNIT_LABEL = { g: 'g', portion: 'portion', glass: 'glass', tbsp: 'tbsp', tsp: 'tsp' };
+
+  function amountText(it) {
+    var unit = it.serving_unit || 'g';
+    if (unit === 'g' || it.serving_amount == null) return Math.round(it.quantity_g) + 'g';
+    return it.serving_amount + ' ' + (UNIT_LABEL[unit] || unit) + ' (' + Math.round(it.quantity_g) + 'g)';
+  }
 
   function checkIcon() {
     return '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><polyline points="20 6 9 17 4 12"/></svg>';
@@ -96,7 +103,7 @@ include __DIR__ . '/partials/head.php';
             '</button>' +
             '<div style="flex:1;">' +
               '<p class="font-medium">' + escapeHtml(it.food_name) + '</p>' +
-              '<p class="text-sm text-gray">' + Math.round(it.quantity_g) + 'g · ' + Math.round(it.calories) + ' kcal</p>' +
+              '<p class="text-sm text-gray">' + amountText(it) + ' · ' + Math.round(it.calories) + ' kcal</p>' +
             '</div>' +
           '</div>';
         });

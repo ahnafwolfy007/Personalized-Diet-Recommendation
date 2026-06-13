@@ -18,6 +18,48 @@ include __DIR__ . '/partials/head.php';
         <span id="pending-pill" class="badge badge-yellow hidden"></span>
       </div>
 
+      <!-- Add a food (admin-added foods are verified immediately) -->
+      <div class="card p-6 mb-6">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl">Add a food</h2>
+          <button type="button" id="toggle-add" class="btn-link">+ New food</button>
+        </div>
+        <div id="add-panel" class="hidden mt-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="form-group">
+              <label for="af-name">Food name</label>
+              <input type="text" id="af-name" maxlength="150" placeholder="e.g. Grilled paneer">
+            </div>
+            <div class="form-group">
+              <label for="af-cat">Category</label>
+              <div class="select-wrapper">
+                <select id="af-cat"><?php include __DIR__ . '/partials/category_options.php'; ?></select>
+                <span class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Calories for a known amount</label>
+            <div class="flex gap-2">
+              <input type="number" id="af-amount" value="100" min="0.1" step="0.1" placeholder="amount" style="width:90px;">
+              <div class="select-wrapper" style="flex:1;max-width:200px;">
+                <select id="af-unit">
+                  <option value="g">Grams (g)</option>
+                  <option value="portion">Portion</option>
+                  <option value="glass">Glass</option>
+                  <option value="tbsp">Table-spoon</option>
+                  <option value="tsp">Tea-spoon</option>
+                </select>
+                <span class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+              </div>
+              <input type="number" id="af-cals" min="1" step="1" placeholder="kcal" style="width:90px;">
+            </div>
+            <p class="text-xs text-gray mt-1">Converted to calories per 100g on save.</p>
+          </div>
+          <button type="button" id="af-save" class="btn btn-primary btn-sm">Add food</button>
+        </div>
+      </div>
+
       <div class="bg-white border rounded-lg">
         <div class="p-6 border-b">
           <h2 class="text-xl">Food Database</h2>
@@ -49,7 +91,12 @@ include __DIR__ . '/partials/head.php';
       <div class="form-group"><label for="ef-name">Name</label><input type="text" id="ef-name" maxlength="150"></div>
       <div class="grid grid-cols-2 gap-4">
         <div class="form-group"><label for="ef-cals">Calories per 100g</label><input type="number" id="ef-cals" min="1" max="1000" step="0.1"></div>
-        <div class="form-group"><label for="ef-cat">Category</label><input type="text" id="ef-cat" maxlength="50"></div>
+        <div class="form-group"><label for="ef-cat">Category</label>
+          <div class="select-wrapper">
+            <select id="ef-cat"><?php include __DIR__ . '/partials/category_options.php'; ?></select>
+            <span class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
+          </div>
+        </div>
       </div>
       <label class="flex items-center gap-2" style="font-weight:400;">
         <input type="checkbox" id="ef-verified" style="width:auto;"> Verified (approved nutritional info)
@@ -170,6 +217,44 @@ include __DIR__ . '/partials/head.php';
       calories_per_100g: document.getElementById('ef-cals').value,
       is_verified: document.getElementById('ef-verified').checked ? 1 : 0
     }, closeEdit);
+  });
+
+  // ── Add a food (admin) ──
+  document.getElementById('toggle-add').addEventListener('click', function () {
+    document.getElementById('add-panel').classList.toggle('hidden');
+  });
+  document.getElementById('af-save').addEventListener('click', function () {
+    var name   = document.getElementById('af-name').value.trim();
+    var cat    = document.getElementById('af-cat').value;
+    var amount = document.getElementById('af-amount').value;
+    var unit   = document.getElementById('af-unit').value;
+    var cals   = document.getElementById('af-cals').value;
+    if (!name) { showToast('Enter a food name.', 'error'); return; }
+    if (!amount || amount <= 0) { showToast('Enter the amount.', 'error'); return; }
+    if (!cals || cals <= 0) { showToast('Enter the calories for that amount.', 'error'); return; }
+
+    var fd = new FormData();
+    fd.append('name', name);
+    fd.append('category', cat);
+    fd.append('serving_unit', unit);
+    fd.append('serving_amount', amount);
+    fd.append('calories', cals);
+
+    var btn = this; btn.disabled = true;
+    fetch('../backend/add_food.php', { method: 'POST', body: fd })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        btn.disabled = false;
+        showToast(data.message, data.success ? 'success' : 'error');
+        if (data.success) {
+          document.getElementById('af-name').value = '';
+          document.getElementById('af-cals').value = '';
+          document.getElementById('af-amount').value = '100';
+          document.getElementById('add-panel').classList.add('hidden');
+          load();
+        }
+      })
+      .catch(function () { btn.disabled = false; showToast('Network error. Please try again.', 'error'); });
   });
 
   load();

@@ -48,28 +48,33 @@ if (!$plan) {
     json_response(['success' => false, 'message' => 'No diet plan found.']);
 }
 
-// Structured items + today's completion state.
-$today = date('Y-m-d');
+// Structured items + whether each was already ticked "Taken" today. The "taken"
+// state is derived from food_logs (a row with this plan_item_id logged today).
+[$start, $end] = day_bounds(date('Y-m-d'));
 $stmt = $conn->prepare("
-    SELECT i.item_id, i.meal, i.food_id, f.name AS food_name, i.quantity_g, i.calories,
-           (mc.completion_id IS NOT NULL) AS taken_today
+    SELECT i.item_id, i.meal, i.food_id, f.name AS food_name,
+           i.quantity_g, i.serving_unit, i.serving_amount, i.calories,
+           EXISTS (
+               SELECT 1 FROM food_logs fl
+               WHERE fl.plan_item_id = i.item_id AND fl.user_id = ?
+                 AND fl.logged_at >= ? AND fl.logged_at < ?
+           ) AS taken_today
     FROM diet_plan_items i
     JOIN foods f ON f.food_id = i.food_id
-    LEFT JOIN meal_completions mc
-           ON mc.item_id = i.item_id AND mc.completed_on = ?
     WHERE i.plan_id = ?
     ORDER BY FIELD(i.meal, 'breakfast', 'lunch', 'dinner'), i.item_id
 ");
-$stmt->bind_param('si', $today, $plan['plan_id']);
+$stmt->bind_param('issi', $patient_id, $start, $end, $plan['plan_id']);
 $stmt->execute();
 $res = $stmt->get_result();
 $items = [];
 while ($row = $res->fetch_assoc()) {
-    $row['item_id']     = (int) $row['item_id'];
-    $row['food_id']     = (int) $row['food_id'];
-    $row['quantity_g']  = (float) $row['quantity_g'];
-    $row['calories']    = (float) $row['calories'];
-    $row['taken_today'] = (int) $row['taken_today'];
+    $row['item_id']        = (int) $row['item_id'];
+    $row['food_id']        = (int) $row['food_id'];
+    $row['quantity_g']     = (float) $row['quantity_g'];
+    $row['serving_amount'] = $row['serving_amount'] !== null ? (float) $row['serving_amount'] : null;
+    $row['calories']       = (float) $row['calories'];
+    $row['taken_today']    = (int) $row['taken_today'];
     $items[] = $row;
 }
 $stmt->close();

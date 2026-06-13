@@ -13,8 +13,8 @@ if ($water_id <= 0) {
     json_response(['success' => false, 'message' => 'Invalid entry.']);
 }
 
-// Ownership enforced in the WHERE clause.
-$stmt = $conn->prepare("DELETE FROM water_logs WHERE water_id = ? AND user_id = ?");
+// Ownership + entry-type enforced in the WHERE clause (water rows live in food_logs).
+$stmt = $conn->prepare("DELETE FROM food_logs WHERE log_id = ? AND user_id = ? AND entry_type = 'water'");
 $stmt->bind_param('ii', $water_id, $user_id);
 $stmt->execute();
 $affected = $stmt->affected_rows;
